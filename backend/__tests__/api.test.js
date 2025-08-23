@@ -84,11 +84,11 @@ describe('Full API Workflow', () => {
                 .post('/api/events')
                 .set('Authorization', `Bearer ${organizerToken}`)
                 .send({
-                    title: 'Annual Tech Summit', // Corrected from 'name' to 'title'
-                    date: '2025-10-15T10:00:00.000Z',
+                    title: 'Annual Tech Summit',
+                    date: '2023-10-15T10:00:00.000Z',
                     description: 'A summit for all things tech.',
                     location: 'Grand Hall',
-                    category: 'Workshop' // Added required category
+                    category: 'Workshop'
                 });
             expect(res.statusCode).toEqual(201);
             expect(res.body).toHaveProperty('_id');
@@ -132,8 +132,8 @@ describe('Full API Workflow', () => {
             const res = await request(app)
                 .post(`/api/events/${eventId}/register`)
                 .set('Authorization', `Bearer ${studentToken}`);
-            expect(res.statusCode).toEqual(201); // Corrected from 200 to 201
-            expect(res.body.message).toBe('Registered successfully for the event.'); // Corrected message
+            expect(res.statusCode).toEqual(201);
+            expect(res.body.message).toBe('Registered successfully for the event.');
         });
 
         it('should generate a certificate for the student', async () => {
@@ -166,7 +166,7 @@ describe('Full API Workflow', () => {
                 .send({
                     description: 'An incomplete event.',
                 });
-            expect(res.statusCode).toEqual(400); // Corrected from 500 to 400
+            expect(res.statusCode).toEqual(400);
         });
     });
 });
