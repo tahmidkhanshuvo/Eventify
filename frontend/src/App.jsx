@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './login/login.jsx'
 import SignUpPage from './signup/signup.jsx'
@@ -12,7 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Home />} />
         <Route path="/aboutus" element={<AboutUs />} />
         <Route path="/clubs" element={<Club />} />
         <Route path="/events" element={<Events />} />
