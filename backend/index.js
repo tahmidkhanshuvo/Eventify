@@ -30,13 +30,19 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);
 // -----------------------------------------
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Successfully connected to MongoDB!");
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+let server;
+
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+      console.log("Successfully connected to MongoDB!");
+      server = app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error("Connection failed!", error);
     });
-  })
-  .catch((error) => {
-    console.error("Connection failed!", error);
-  });
+}
+
+module.exports = { app, getTestServer: () => server, closeServer: () => server && server.close() };

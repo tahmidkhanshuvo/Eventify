@@ -29,7 +29,10 @@ const approveOrganizerRequest = async (req, res) => {
             user.status = 'Approved';
             await user.save();
             await sendApprovalEmail(user.email, tempPassword);
-            res.json({ message: `Organizer ${user.username} approved successfully.` });
+            res.json({
+                message: `Organizer ${user.username} approved successfully.`,
+                tempPassword: tempPassword
+            });
         } else {
             res.status(404).json({ message: 'Pending organizer request not found.' });
         }

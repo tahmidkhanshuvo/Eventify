@@ -31,8 +31,8 @@ const isStudent = (req, res, next) => {
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
 router.post('/', protect, canManageEvents, createEvent);
-router.put('/:id', protect, updateEvent);
-router.delete('/:id', protect, deleteEvent);
+router.put('/:id', protect, canManageEvents, updateEvent);
+router.delete('/:id', protect, canManageEvents, deleteEvent);
 router.get('/:id/attendees', protect, getEventAttendees);
 router.post('/:id/register', protect, isStudent, registerForEvent);
 router.delete('/:id/unregister', protect, isStudent, unregisterFromEvent);
