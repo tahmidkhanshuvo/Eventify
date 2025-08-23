@@ -1,24 +1,12 @@
 import React, { useState } from "react";
 import { Switch } from "@mui/material";
-// SVG Icon for the logo
+
+// SVG Icons (LogoIcon, GoogleIcon, EyeIcon)
 const LogoIcon = () => (
-  <svg
-    width="40"
-    height="40"
-    viewBox="0 0 40 40"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="20" cy="20" r="20" fill="url(#paint0_linear_1_2)" />
     <defs>
-      <linearGradient
-        id="paint0_linear_1_2"
-        x1="0"
-        y1="0"
-        x2="40"
-        y2="40"
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="paint0_linear_1_2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
         <stop stopColor="#FFC700" />
         <stop offset="1" stopColor="#A259FF" />
       </linearGradient>
@@ -26,7 +14,6 @@ const LogoIcon = () => (
   </svg>
 );
 
-// SVG Icon for Google
 const GoogleIcon = () => (
   <svg className="w-6 h-6" viewBox="0 0 24 24">
     <path
@@ -36,7 +23,6 @@ const GoogleIcon = () => (
   </svg>
 );
 
-// SVG Icon for the eye (password visibility)
 const EyeIcon = ({ visible }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -71,16 +57,12 @@ const EyeIcon = ({ visible }) => (
 
 export default function LoginPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
-
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
 
   return (
-    // Main container: Column layout on mobile, row on large screens
     <div className="w-full min-h-screen flex flex-col lg:flex-row font-sans">
-      
-      {/* Image Section: Takes full width on mobile, half on large screens */}
       <div className="w-full lg:w-1/2 h-64 lg:h-screen relative">
         <img
           className="object-cover w-full h-full"
@@ -88,147 +70,145 @@ export default function LoginPage() {
           alt="A sailboat on the water near a lighthouse"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src =
-              "https://placehold.co/1000x1200/a7d8de/ffffff?text=Scenic+View";
+            e.target.src = "https://placehold.co/1000x1200/a7d8de/ffffff?text=Scenic+View";
           }}
         />
         <div className="absolute bottom-4 left-4 text-white text-xs sm:text-sm bg-black bg-opacity-30 p-2 rounded">
           Photo by Alexandr Popadin
         </div>
       </div>
-
-      {/* Form Section: Takes full width on mobile, half on large screens */}
-      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 sm:p-8 md:p-12">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
+<div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 sm:p-8 md:p-12">
+    <div className="w-full max-w-sm mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <LogoIcon />
             <span className="text-lg sm:text-xl font-sora-300 text-gray-800">
-              UI Unicorn
+                UI Unicorn
             </span>
-          </div>
+        </div>
 
-          <h2 className="text-2xl sm:text-3xl font-sora-500 text-gray-900 mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-sora-500 text-gray-900 mb-6 sm:mb-8">
             Nice to see you again
-          </h2>
+        </h2>
 
-          {/* Form */}
-          <form className="space-y-5 sm:space-y-6">
+        {/* Form */}
+        <form className="space-y-5 sm:space-y-6">
             <div>
-              <label
-                htmlFor="email"
-                className="px-2 block text-sm font-medium text-gray-700 mb-1"
-              >
-                Login
-              </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Email or phone number"
-                className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-              />
+                <label
+                    htmlFor="email"
+                    className="px-2 block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Login
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email or phone number"
+                    className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                />
             </div>
             <div className="relative">
-              <label
-                htmlFor="password"
-                className="px-2 block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password
-              </label>
-              <input
-                type={passwordVisible ? "text" : "password"}
-                id="password"
-                placeholder="Enter password"
-                className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-              />
-              <div
-                className="absolute inset-y-0 right-0 pr-3 flex items-center top-7"
-                onClick={togglePasswordVisibility}
-              >
-                <EyeIcon visible={passwordVisible} />
-              </div>
+                <label
+                    htmlFor="password"
+                    className="px-2 block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Password
+                </label>
+                <input
+                    type={passwordVisible ? "text" : "password"}
+                    id="password"
+                    placeholder="Enter password"
+                    className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                />
+                <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center top-7"
+                    onClick={togglePasswordVisibility}
+                >
+                    <EyeIcon visible={passwordVisible} />
+                </div>
             </div>
+
             {/* Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm gap-3 sm:gap-0">
-            <div className="flex items-center gap-2">
-            <Switch
-              size="sm"
-              color="primary"
-              variant="outlined"
-              id="remember-me"
-              slotProps={{ input: { 'aria-label': 'Remember me' } }}
-              />
-            <label htmlFor="remember-me" className="text-gray-900 font-sora">
-            Remember me
-            </label>
+                <div className="flex items-center gap-2">
+                    <Switch
+                        size="sm"
+                        color="primary"
+                        variant="outlined"
+                        id="remember-me"
+                        slotProps={{ input: { 'aria-label': 'Remember me' } }}
+                    />
+                    <label htmlFor="remember-me" className="text-gray-900 font-sora">
+                        Remember me
+                    </label>
+                </div>
+                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                    Forgot password?
+                </a>
             </div>
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                Forgot password?
-              </a>
-            </div>
-            
+
             {/* Submit Buttons */}
             <button
-              type="submit"
-              className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                type="submit"
+                className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
             >
-              Sign in
+                Sign in
             </button>
 
-            <hr class="h-px  bg-gray-200 border-0 dark:bg-gray-300"/>
+            <hr className="h-px bg-gray-200 border-0 dark:bg-gray-300" />
             <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300"
+                type="button"
+                className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300"
             >
-              <GoogleIcon />
-               sign in with Google
+                <GoogleIcon />
+                sign in with Google
             </button>
-          </form>
+        </form>
 
-          {/* Sign up link */}
-          <p className="text-center text-sm text-gray-600 mt-8">
+        {/* Sign up link */}
+        <p className="text-center text-sm text-gray-600 mt-8">
             Don't have an account?{" "}
             <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign up now
+                Sign up now
             </a>
-          </p>
+        </p>
 
-          {/* Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between mt-10 sm:mt-12 text-xs text-gray-500 gap-2 sm:gap-0">
+        {/* Footer */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-10 sm:mt-12 text-xs text-gray-500 gap-2 sm:gap-0">
             <div className="flex items-center gap-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 40 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle
-                  cx="20"
-                  cy="20"
-                  r="20"
-                  fill="url(#paint0_linear_footer)"
-                />
-                <defs>
-                  <linearGradient
-                    id="paint0_linear_footer"
-                    x1="0"
-                    y1="0"
-                    x2="40"
-                    y2="40"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#FFC700" />
-                    <stop offset="1" stopColor="#A259FF" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <span>uiunicorn.com</span>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 40 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <circle
+                        cx="20"
+                        cy="20"
+                        r="20"
+                        fill="url(#paint0_linear_footer)"
+                    />
+                    <defs>
+                        <linearGradient
+                            id="paint0_linear_footer"
+                            x1="0"
+                            y1="0"
+                            x2="40"
+                            y2="40"
+                            gradientUnits="userSpaceOnUse"
+                        >
+                            <stop stopColor="#FFC700" />
+                            <stop offset="1" stopColor="#A259FF" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>uiunicorn.com</span>
             </div>
             <span>© Perfect Login 2021</span>
-          </div>
         </div>
-      </div>
+    </div>
+</div>
     </div>
   );
 }
