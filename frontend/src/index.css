@@ -1,5 +1,71 @@
+/* Import Tailwind */
 @import "tailwindcss";
 
+/* Register all Sora weights */
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../src/assets/Fonts/Sora-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Define custom CSS variables for Tailwind v4 */
+@theme {
+  --font-sora: "Sora", sans-serif;
+
+  /* Optional custom named variants */
+  --font-sora-200: "Sora", sans-serif;
+  --font-sora-300: "Sora", sans-serif;
+  --font-sora-400: "Sora", sans-serif;
+  --font-sora-500: "Sora", sans-serif;
+  --font-sora-600: "Sora", sans-serif;
+  --font-sora-700: "Sora", sans-serif;
+  --font-sora-800: "Sora", sans-serif;
+}
+
+/*
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -68,3 +134,4 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+*/
