@@ -6,21 +6,30 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middlewares
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // To parse JSON request bodies
+app.use(cors());
+app.use(express.json());
 
-// A simple test route
+// --- Make sure these lines are here ---
+const authRoutes = require('./routes/auth');
+const superAdminRoutes = require('./routes/superAdmin');
+const eventRoutes = require('./routes/events');
+const registrationRoutes = require('./routes/registrations');
+const chatbotRoutes = require('./routes/chatbot');
+//const certificateRoutes = require('./routes/certificates');
+
 app.get('/', (req, res) => {
   res.send('Eventify API is running!');
 });
 
-// TODO: Connect to MongoDB and start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// --- This are for routing ---
+app.use('/api/auth', authRoutes);
+app.use('/api/superadmin', superAdminRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.use('/api/chatbot', chatbotRoutes);
+//app.use('/api/certificates', certificateRoutes);
+// -----------------------------------------
 
-// Connect to MongoDB and start the server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Successfully connected to MongoDB!");
