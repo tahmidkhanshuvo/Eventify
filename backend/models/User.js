@@ -2,42 +2,52 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+    fullName: { type: String, required: true },
     username: { type: String, required: true, unique: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, required: true },
+    phoneNumber: { type: String },
+    address: { type: String },
+    university: {
+        type: String,
+        required: function() { return this.role === 'Student' || this.role === 'Organizer'; }
+    },
     role: {
         type: String,
         enum: ['Student', 'Organizer', 'Super Admin'],
         required: true
     },
-    mobileNumber: { type: String },
-    address: { type: String },
     status: {
         type: String,
         enum: ['Pending', 'Approved'],
         default: 'Approved'
     },
+
     // Student-specific fields
-    university: {
-        type: String,
-        required: function() { return this.role === 'Student'; }
-    },
     department: {
         type: String,
         required: function() { return this.role === 'Student'; }
     },
-    semester: {
+    academicYear: {
         type: String,
         required: function() { return this.role === 'Student'; }
     },
+    studentId: {
+        type: String,
+        required: function() { return this.role === 'Student'; }
+    },
+
     // Organizer-specific fields
     clubName: {
         type: String,
         required: function() { return this.role === 'Organizer'; }
     },
-    position: {
+    clubPosition: {
         type: String,
         required: function() { return this.role === 'Organizer'; }
+    },
+    clubWebsite: {
+        type: String
     }
 }, { timestamps: true });
 

@@ -8,15 +8,15 @@ const generateToken = (id) => {
 };
 
 const registerStudent = async (req, res) => {
-    const { username, email, password, mobileNumber, address, university, department, semester } = req.body;
+    const { fullName, username, email, password, phoneNumber, address, university, department, academicYear, studentId } = req.body;
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: 'User with this email already exists' });
         }
         const user = await User.create({
-            username, email, password, role: 'Student', status: 'Approved',
-            mobileNumber, address, university, department, semester
+            fullName, username, email, password, role: 'Student', status: 'Approved',
+            phoneNumber, address, university, department, academicYear, studentId
         });
         res.status(201).json({
             _id: user._id, username: user.username, email: user.email, role: user.role,
@@ -28,15 +28,15 @@ const registerStudent = async (req, res) => {
 };
 
 const registerOrganizer = async (req, res) => {
-    const { username, email, password, mobileNumber, address, clubName, position } = req.body;
+    const { fullName, username, email, password, phoneNumber, address, university, clubName, clubPosition, clubWebsite } = req.body;
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: 'An account with this email already exists or is pending approval.' });
         }
         await User.create({
-            username, email, password, role: 'Organizer', status: 'Pending',
-            mobileNumber, address, clubName, position
+            fullName, username, email, password, role: 'Organizer', status: 'Pending',
+            phoneNumber, address, university, clubName, clubPosition, clubWebsite
         });
         res.status(201).json({ message: 'Registration successful! Your application is now pending approval.' });
     } catch (error) {
