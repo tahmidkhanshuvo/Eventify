@@ -26,7 +26,7 @@ export const SidebarProvider = ({
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+    <SidebarContext.Provider value={{ open, setOpen, animate: animate }} className="bg-transparent">
       {children}
     </SidebarContext.Provider>
   );
@@ -128,22 +128,43 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
+  labelClassName,   // ⬅️ NEW
+  iconClassName,    // ⬅️ NEW
   ...props
 }) => {
   const { open, animate } = useSidebar();
+  const { href = "#", icon, label } = link || {};
+
+  // Let callers override the icon color too
+  const iconNode = icon
+    ? React.cloneElement(icon, {
+        className: cn(icon.props?.className, iconClassName),
+      })
+    : null;
+
   return (
     <a
-      href={link.href}
-      className={cn("flex items-center justify-start gap-2  group/sidebar py-2", className)}
-      {...props}>
-      {link.icon}
+      href={href}
+      className={cn(
+        "group/sidebar flex items-center justify-start gap-2 py-2 ",
+        className
+      )}
+      {...props}
+    >
+      {iconNode}
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0">
-        {link.label}
+        className={cn(
+          // default colors (can be overridden)
+          "inline-block whitespace-pre text-sm transition duration-150 group-hover/sidebar:translate-x-1 !m-0 !p-0",
+          "text-neutral-700 dark:text-neutral-200 font-sora-500 font-bold",
+          labelClassName // ⬅️ allow override like !text-white
+        )}
+      >
+        {label}
       </motion.span>
     </a>
   );

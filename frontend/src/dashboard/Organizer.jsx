@@ -57,7 +57,7 @@ export default function Organizer() {
   return (
     <SidebarDemo links={links} user={user} defaultOpen={true}>
       {/* your routed content or any JSX */}
-      <div className="prose">
+      <div className="bg-transparent">
         <h2>Welcome!</h2>
         <p>Render your page content here.</p>
       </div>
