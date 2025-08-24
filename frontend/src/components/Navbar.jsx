@@ -286,6 +286,7 @@ function NavbarLogo() {
       <img
         src="https://ik.imagekit.io/qlaegzdb2/Eventify-white.png?updatedAt=1756038031417"
         alt="Eventify logo"
+
         width={150}
         height={50}
         className="object-contain"
@@ -293,6 +294,7 @@ function NavbarLogo() {
     </a>
   );
 }
+
 
 function NavbarButton({
   href,

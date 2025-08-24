@@ -126,6 +126,7 @@ export default function Signup() {
                         : "text-white/80 hover:text-white"
                     }`}
                     aria-pressed={role === "student"}
+
                   >
                     Student
                   </button>
@@ -254,7 +255,6 @@ export default function Signup() {
                     </div>
                   )}
                 </div>
-
                 {/* (Department | Club Position) + City */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {role === "student" ? (
@@ -443,7 +443,7 @@ export default function Signup() {
   );
 }
 
-/* ------- Background animation ------- */
+/* --- BackgroundFX --- */
 function BackgroundFX() {
   return (
     <>
@@ -455,11 +455,12 @@ function BackgroundFX() {
       </div>
       <div className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-screen [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:36px_36px]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,transparent,rgba(0,0,0,0.65))]" />
+
     </>
   );
 }
 
-/* ------- tiny inline icon ------- */
+/* --- Eye --- */
 function Eye({ open }) {
   return open ? (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
