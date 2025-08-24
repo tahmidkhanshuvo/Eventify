@@ -12,7 +12,7 @@ import Events from "./navbar/Events.jsx";
 import Student from "./dashboard/Student.jsx";
 import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
 import Organizer from "./dashboard/Organizer.jsx";
-
+import CreateEvent from "./Pages/Create_events.jsx";
 // ✅ make sure this path/casing matches your file exactly
 // If your file is ./Pages/My_events.jsx keep your original import
 import MyEvents from "./Pages/My_events.jsx";
@@ -38,8 +38,13 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/admin" element={<MainAdmin />} />
-            <Route path="/organizers" element={<Organizer />} />
-
+  <Route path="/organizers" element={<Organizer />}>
+    <Route index element={<Navigate to="create-event" replace />} />
+    <Route path="myevents" element={<MyEvents />} />
+    <Route path="allevents" element={<All_events />} />
+    <Route path="create-event" element={<CreateEvent />} />
+    {/* <Route path="myprofile" element={<Profile />} /> */}
+  </Route>
             {/* Nested student area */}
             <Route path="/student" element={<Student />}>
               {/* default -> /students/myevents */}

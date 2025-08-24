@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // ⬅️ add
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -8,51 +9,43 @@ export default function SidebarDemo({
   user = null,
   defaultOpen = false,
   className = "",
-  pages = {},              // ⬅️ NEW: map of href -> JSX
-  initialHref,             // ⬅️ NEW: default selected href
-  children,                // fallback if no page is found
+  children, // we will render <Outlet /> from the parent here
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const navigate = useNavigate();           // ⬅️
+  const { pathname } = useLocation();       // ⬅️
 
   const fallbackLinks = [
-    { label: "My Events", href: "/",         icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
-    { label: "All Events", href: "/myevents",  icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
-    { label: "Profile",    href: "/me",      icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
-    { label: "Logout",     href: "/home",    icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
+    { label: "My Events", href: "/student/myevents", icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
+    { label: "All Events", href: "/student/allevents", icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
+    { label: "Profile", href: "/student/myprofile", icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
+    { label: "Logout", href: "/", icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
   ];
-
   const finalLinks = links.length ? links : fallbackLinks;
-
-  // ⬇️ active page state
-  const [activeHref, setActiveHref] = useState(
-    initialHref || finalLinks[0]?.href || "/"
-  );
 
   return (
     <div
       className={cn(
         "fixed inset-0 flex h-dvh w-screen overflow-hidden md:flex-row",
-        "bg-transparent", // shell stays transparent
+        "bg-transparent",
         className
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="min-h-0 justify-between gap-10 bg-black ">
+        <SidebarBody className="min-h-0 justify-between gap-10 bg-black">
           <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
             <div className="mt-8 flex flex-col gap-2">
               {finalLinks.map((link, idx) => {
-                const active = activeHref === link.href;
+                const active = pathname === link.href || pathname.startsWith(link.href);
                 return (
                   <SidebarLink
                     key={link.href || idx}
                     link={link}
                     onClick={(e) => {
-                      e.preventDefault();           // stay SPA
-                      setActiveHref(link.href);     // switch right pane
+                      e.preventDefault();
+                      navigate(link.href);    // ⬅️ route change, URL updates
                     }}
-                    className={cn(
-                      "rounded-md px-2 bg-transparent hover:bg-transparent focus:bg-transparent"
-                    )}
+                    className="rounded-md px-2 bg-transparent hover:bg-transparent focus:bg-transparent"
                     labelClassName={cn("!text-white", active && "font-semibold")}
                     iconClassName="!text-white"
                     aria-current={active ? "page" : undefined}
@@ -75,10 +68,10 @@ export default function SidebarDemo({
         </SidebarBody>
       </Sidebar>
 
-      {/* right content area — transparent */}
+      {/* Right content area (renders <Outlet /> that the parent passes as children) */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <div className="min-h-0 flex w-full flex-1 flex-col gap-4 overflow-y-auto bg-transparent p-4 md:p-10">
-          {pages[activeHref] ?? children ?? <PlaceholderDashboard />}
+          {children}
         </div>
       </div>
     </div>
