@@ -1,9 +1,0 @@
-:root {
-  --color-primary: #5d429a;   /* purple */
-  --color-secondary: #7d9dd2; /* blue */
-  --color-accent: #5fc3b1;    /* teal */
-
-  --color-sidebar: var(--color-primary);
-  --color-sidebar-hover: var(--color-accent);
-  --color-sidebar-active: var(--color-secondary);
-}
