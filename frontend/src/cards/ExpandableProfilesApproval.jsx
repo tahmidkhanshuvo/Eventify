@@ -1,10 +1,12 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
+export default function ExpandableProfilesApproval({ profiles: initialProfiles = [] }) {
   const [profiles, setProfiles] = React.useState(initialProfiles);
   const [selected, setSelected] = React.useState(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     setProfiles(initialProfiles);
@@ -13,6 +15,24 @@ export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
   const handleDelete = (id) => {
     setProfiles((prev) => prev.filter((p) => p.id !== id));
     setSelected((cur) => (cur?.id === id ? null : cur));
+  };
+
+  // Save to localStorage and go to /storedthelist
+  const handleApprove = (profileObj) => {
+    try {
+      const key = "approvedProfiles";
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+      // de-dupe by id
+      const next = existing.some((p) => p.id === profileObj.id)
+        ? existing.map((p) => (p.id === profileObj.id ? profileObj : p))
+        : [...existing, profileObj];
+
+      localStorage.setItem(key, JSON.stringify(next));
+      setSelected(null);
+      navigate("/storedthelist"); // <-- route you want to show the stored list
+    } catch (e) {
+      console.error("Failed to approve profile:", e);
+    }
   };
 
   const fallbackAvatar =
@@ -47,18 +67,32 @@ export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
               </div>
             </div>
 
-            {/* Right: Delete */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(p.id);
-              }}
-              className="shrink-0 rounded-full bg-red-600 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 active:scale-95"
-              aria-label={`Delete ${p.profile?.name || "profile"}`}
-              title="Delete card"
-            >
-              Delete
-            </button>
+            {/* Right: Approve + Delete */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleApprove(p);
+                }}
+                className="shrink-0 rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-600 active:scale-95"
+                aria-label={`Approve ${p.profile?.name || "profile"}`}
+                title="Approve"
+              >
+                Approve
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(p.id);
+                }}
+                className="shrink-0 rounded-full bg-red-600 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 active:scale-95"
+                aria-label={`Delete ${p.profile?.name || "profile"}`}
+                title="Delete card"
+              >
+                Delete
+              </button>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -112,7 +146,7 @@ export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
                         {selected.profile?.joined && (
                           <div>
                             Joined:{" "}
-                          <span className="font-medium">
+                            <span className="font-medium">
                               {selected.profile.joined}
                             </span>
                           </div>
@@ -134,6 +168,14 @@ export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleApprove(selected)}
+                      className="rounded-full bg-emerald-500 px-3 py-2 text-white hover:bg-emerald-600"
+                      aria-label="Approve profile"
+                      title="Approve profile"
+                    >
+                      Approve
+                    </button>
                     <button
                       onClick={() => handleDelete(selected.id)}
                       className="rounded-full bg-red-600 p-2 text-white hover:bg-red-700"

@@ -17,8 +17,10 @@ import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
 import Events from "./navbar/Events.jsx";
-import Student from "./dahsboard/Student.jsx";
+import Student from "./dashboard/Student.jsx";
 import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
+import Organizer from "./dashboard/Organizer.jsx";  
+
 
 function AppInner() {
   const location = useLocation();
@@ -73,7 +75,7 @@ function AppInner() {
   return (
     <div>
       {!hideGlobalBg && <BackgroundFX />}
-
+    
       <div className="relative z-10">
         <Routes>
           {/* Public menu pages wrapped with Layout so they show Navbar + Footer */}

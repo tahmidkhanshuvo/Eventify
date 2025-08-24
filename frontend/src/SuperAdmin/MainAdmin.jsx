@@ -1,3 +1,4 @@
+
 // components/auth/SuperAdminLogin.jsx
 "use client";
 
@@ -171,6 +172,7 @@ export default function SuperAdminLogin() {
   );
 }
 
+
 /* ---------- Helper components ---------- */
 
 function GlowButton({ children, className = "", ...props }) {
@@ -217,3 +219,4 @@ function BackgroundDecor() {
     </>
   );
 }
+
