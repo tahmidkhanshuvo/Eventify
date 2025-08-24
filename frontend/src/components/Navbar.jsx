@@ -21,7 +21,7 @@ import {
 
 export default function Navbar() {
   const navItems = [
-    { name: "Home", link: "home" },
+    { name: "Home", link: "/" },
     { name: "Events", link: "events" },
     { name: "Clubs", link: "clubs" },
     { name: "About Us", link: "about" },
