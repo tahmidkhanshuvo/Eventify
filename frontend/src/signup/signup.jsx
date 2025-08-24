@@ -6,20 +6,91 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 
 export default function Signup() {
+  const [role, setRole] = useState("student"); // "student" | "organizer"
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [role, setRole] = useState("student"); // "student" | "organizer"
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setErr("");
+    setOk("");
+
     const form = new FormData(e.currentTarget);
     const pwd = form.get("password");
     const confirm = form.get("confirm");
     if (pwd !== confirm) {
-      alert("Passwords do not match.");
+      setErr("Passwords do not match.");
       return;
     }
-    // Handle signup
+
+    let payload;
+    let endpoint;
+
+    if (role === "student") {
+      payload = {
+        fullName: form.get("fullName"),
+        username: form.get("username"),
+        email: form.get("email"),
+        password: pwd,
+        phoneNumber: form.get("phone"),
+        address: form.get("city"), // City -> address
+        university: form.get("university"),
+        department: form.get("department"),
+        academicYear: form.get("year"),
+        studentId: form.get("studentId"),
+      };
+      endpoint = "/api/auth/register/student";
+    } else {
+      payload = {
+        fullName: form.get("fullName"),
+        username: form.get("username"),
+        email: form.get("email"),
+        password: pwd,
+        phoneNumber: form.get("phone"),
+        address: form.get("city"), // City -> address
+        university: form.get("university"),
+        clubName: form.get("clubName"),
+        clubPosition: form.get("clubPosition"),
+        clubWebsite: form.get("clubWebsite") || undefined, // optional
+      };
+      endpoint = "/api/auth/register/organizer";
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.message || "Signup failed");
+      }
+
+      if (data?.token) localStorage.setItem("token", data.token);
+
+      const successText =
+        data?.message ||
+        (role === "organizer"
+          ? "Registration submitted! Your organizer account is pending approval. Redirecting to login…"
+          : "Account created! Redirecting to login…");
+
+      setOk(successText);
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 800);
+    } catch (e2) {
+      setErr(e2.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -39,11 +110,11 @@ export default function Signup() {
                 </h1>
                 <br />
                 <p className="text-white/80 text-sm mt-3">
-                  Where Students and Club Members Connect, Learn & Grow
+                  Where Students and Club Members Connect, Learn &amp; Grow
                 </p>
               </header>
 
-              {/* Toggle */}
+              {/* Role toggle */}
               <div className="mb-6 flex items-center justify-center">
                 <div className="inline-flex rounded-2xl bg-white/10 p-1 backdrop-blur-md border border-white/10">
                   <button
@@ -54,6 +125,8 @@ export default function Signup() {
                         ? "bg-white text-black"
                         : "text-white/80 hover:text-white"
                     }`}
+                    aria-pressed={role === "student"}
+
                   >
                     Student
                   </button>
@@ -65,14 +138,34 @@ export default function Signup() {
                         ? "bg-white text-black"
                         : "text-white/80 hover:text-white"
                     }`}
+                    aria-pressed={role === "organizer"}
                   >
                     Organizer
                   </button>
                 </div>
               </div>
 
-              <form className="space-y-6" onSubmit={handleSubmit}>
+              <form className="space-y-6" onSubmit={handleSubmit} noValidate>
                 <input type="hidden" name="role" value={role} />
+
+                {err && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+                    aria-live="polite"
+                  >
+                    {err}
+                  </div>
+                )}
+                {ok && (
+                  <div
+                    role="status"
+                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200"
+                    aria-live="polite"
+                  >
+                    {ok}
+                  </div>
+                )}
 
                 {/* Full Name */}
                 <div className="space-y-2">
@@ -88,7 +181,7 @@ export default function Signup() {
                   />
                 </div>
 
-                {/* Email + Username */}
+                {/* Email, Username */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-white/85">
@@ -101,6 +194,7 @@ export default function Signup() {
                       placeholder="you@example.com"
                       required
                       className="h-12"
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -132,6 +226,7 @@ export default function Signup() {
                       className="h-12"
                     />
                   </div>
+
                   {role === "student" ? (
                     <div className="space-y-2">
                       <Label htmlFor="studentId" className="text-white/85">
@@ -160,8 +255,7 @@ export default function Signup() {
                     </div>
                   )}
                 </div>
-
-                {/* (Department | Club Post) + City */}
+                {/* (Department | Club Position) + City */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {role === "student" ? (
                     <div className="space-y-2">
@@ -185,18 +279,19 @@ export default function Signup() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Label htmlFor="clubPost" className="text-white/85">
-                        Club Post
+                      <Label htmlFor="clubPosition" className="text-white/85">
+                        Club Position
                       </Label>
                       <Input
-                        id="clubPost"
-                        name="clubPost"
+                        id="clubPosition"
+                        name="clubPosition"
                         placeholder="e.g., President / Coordinator"
                         required
                         className="h-12"
                       />
                     </div>
                   )}
+
                   <div className="space-y-2">
                     <Label htmlFor="city" className="text-white/85">
                       City
@@ -211,7 +306,7 @@ export default function Signup() {
                   </div>
                 </div>
 
-                {/* Year + University OR Wide University */}
+                {/* Year + University (student) OR University + (optional) Club Website (organizer) */}
                 {role === "student" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -246,18 +341,32 @@ export default function Signup() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 w-full md:w-[95%] mx-auto">
-                    <Label htmlFor="university" className="text-white/85">
-                      University Name
-                    </Label>
-                    <Input
-                      id="university"
-                      name="university"
-                      placeholder="e.g., Daffodil International University"
-                      required
-                      className="h-12"
-                    />
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="university" className="text-white/85">
+                        University Name
+                      </Label>
+                      <Input
+                        id="university"
+                        name="university"
+                        placeholder="e.g., Daffodil International University"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="clubWebsite" className="text-white/85">
+                        Club Website (optional)
+                      </Label>
+                      <Input
+                        id="clubWebsite"
+                        name="clubWebsite"
+                        type="url"
+                        placeholder="https://example.com"
+                        className="h-12"
+                      />
+                    </div>
+                  </>
                 )}
 
                 {/* Passwords */}
@@ -274,19 +383,22 @@ export default function Signup() {
                         placeholder="Create a strong password"
                         required
                         className="h-12 pr-12"
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/80 hover:bg-white/10"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         <Eye open={showPassword} />
                       </button>
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="confirm" className="text-white/85">
-                      Confirm Password
+                      Confirm password
                     </Label>
                     <div className="relative">
                       <Input
@@ -296,11 +408,13 @@ export default function Signup() {
                         placeholder="Re-type password"
                         required
                         className="h-12 pr-12"
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirm((v) => !v)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/80 hover:bg-white/10"
+                        aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
                       >
                         <Eye open={showConfirm} />
                       </button>
@@ -308,17 +422,20 @@ export default function Signup() {
                   </div>
                 </div>
 
+                <div className="pt-4" />
                 <button
                   type="submit"
-                  className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-12 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)] mt-6"
+                  disabled={loading}
+                  className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-12 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)] mt-4 disabled:opacity-60"
                 >
-                  Create account
+                  {loading ? "Creating account…" : "Create account"}
                 </button>
               </form>
             </div>
-            <p className="mt-20 text-center text-xl text-white/60">
-              Join us today.
-            </p>
+
+            <p className="mt-20 text-center text-xl text-white/60">Join us today.</p>
+            <br />
+            <br />
           </div>
         </section>
       </Layout>
@@ -333,6 +450,12 @@ function BackgroundFX() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_600px_at_10%_-10%,#7d9dd2_12%,transparent_60%),radial-gradient(1000px_600px_at_90%_-10%,#3fc3b1_12%,transparent_60%)] opacity-30" />
       <div className="pointer-events-none absolute -top-44 -left-36 h-[40rem] w-[40rem] rounded-full bg-[#7d9dd2]/25 blur-3xl animate-float-slow" />
       <div className="pointer-events-none absolute -top-32 -right-40 h-[34rem] w-[34rem] rounded-full bg-[#3fc3b1]/25 blur-3xl animate-float-slower" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.22]">
+        <div className="absolute left-1/2 top-1/2 h-[180vmax] w-[180vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_0deg,rgba(125,157,210,0.25),transparent_30%,rgba(63,195,177,0.25),transparent_70%)] animate-rotate-slower" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-screen [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:36px_36px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,transparent,rgba(0,0,0,0.65))]" />
+
     </>
   );
 }

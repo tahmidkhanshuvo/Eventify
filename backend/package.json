@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npx nodemon index.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "sharp": "^0.34.3",
+    "supertest": "^7.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "imagekit": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.5",
+    "pdfkit": "^0.17.1"
+  }
+}
+

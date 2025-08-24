@@ -7,6 +7,75 @@ import Layout from "@/components/Layout";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    setOk("");
+
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email");
+    const password = form.get("password");
+
+    if (!email || !password) {
+      setErr("Please enter email and password.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // receive httpOnly cookie
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || "Login failed");
+
+      // Only allow Student or Organizer here
+      if (data?.role !== "Student" && data?.role !== "Organizer") {
+        try {
+          await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+        } catch {}
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        throw new Error("This login is for Students and Organizers only.");
+      }
+
+      // Optional: store token for client-only needs (cookie already set)
+      if (data?.token) localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          _id: data?._id,
+          username: data?.username,
+          email: data?.email,
+          role: data?.role,
+        })
+      );
+
+      // notify Layout/Navbar listeners
+      try {
+        window.dispatchEvent(new Event("auth:changed"));
+      } catch {}
+
+      // role-based redirect (Student -> /student, Organizer -> /organizers)
+      const dest = data?.role === "Student" ? "/student" : "/organizers";
+      setOk("Logged in! Redirecting…");
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 500);
+    } catch (e2) {
+      setErr(e2.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main
@@ -30,13 +99,27 @@ export default function Login() {
               </header>
 
               {/* Form */}
-              <form
-                className="space-y-6"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  // Handle login
-                }}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+                {/* status banners */}
+                {err && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+                    aria-live="polite"
+                  >
+                    {err}
+                  </div>
+                )}
+                {ok && (
+                  <div
+                    role="status"
+                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200"
+                    aria-live="polite"
+                  >
+                    {ok}
+                  </div>
+                )}
+
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-white/[0.85]">
@@ -49,6 +132,7 @@ export default function Login() {
                     placeholder="you@example.com"
                     required
                     className="h-12"
+                    autoComplete="email"
                   />
                 </div>
 
@@ -65,6 +149,7 @@ export default function Login() {
                       placeholder="••••••••"
                       required
                       className="h-12 pr-12"
+                      autoComplete="current-password"
                     />
                     <button
                       type="button"
@@ -80,9 +165,10 @@ export default function Login() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-12 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)] mt-2"
+                  disabled={loading}
+                  className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-12 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)] mt-2 disabled:opacity-60"
                 >
-                  Sign in
+                  {loading ? "Signing in…" : "Sign in"}
                 </button>
 
                 {/* Forgot password link */}
@@ -101,7 +187,7 @@ export default function Login() {
             <p className="mt-8 text-center text-sm text-white/70">
               Don’t have an account?{" "}
               <a
-                href="#signup"
+                href="/signup"
                 className="font-semibold text-[#7d9dd2] hover:text-[#3fc3b1] transition-colors"
               >
                 Sign Up

@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/sidebar1";
 import { Button } from "@/components/ui/button";
 // Sample data with `url` and `isActive` properties.
 const data = {
@@ -39,9 +39,9 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }) {
+export function AppSidebar() {
   return (
-    <Sidebar {...props}>
+    <Sidebar className="bg-sidebar/80">
       <SidebarHeader>
         drctbhjjhj
         <SearchForm />

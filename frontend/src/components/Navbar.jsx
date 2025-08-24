@@ -11,23 +11,28 @@ import {
 } from "motion/react";
 
 /**
- * components/Navbar.jsx
- * Resizable navbar with glassmorphism:
- * - Fully rounded pill container with backdrop blur + translucent background
- * - Centered nav items with soft hover highlight
- * - Right-side auth buttons (Sign in / Sign up)
- * - Mobile header with hamburger + drawer
+ * Navbar (auth-aware)
+ * - Shows Log in / Sign up when logged out
+ * - Shows Dashboard + Logout when logged in
+ * - Mobile drawer includes the same actions
  */
-
-export default function Navbar() {
+export default function Navbar({ user, onLogout = () => {} }) {
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "Events", link: "events" },
-    { name: "Clubs", link: "clubs" },
-    { name: "About Us", link: "about" },
+    { name: "Events", link: "/events" },
+    { name: "Clubs", link: "/clubs" },
+    { name: "About Us", link: "/aboutus" },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Updated: Student -> /student, Organizer -> /organizers, else /
+  const dashboardLink =
+    user?.role === "Student"
+      ? "/student"
+      : user?.role === "Organizer"
+      ? "/organizers"
+      : "/";
 
   return (
     <div className="relative w-full">
@@ -37,16 +42,33 @@ export default function Navbar() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-3">
-            <NavbarButton
-              variant="secondary"
-              href="login"
-              className="!text-white hover:!text-black transition-colors"
-            >
-              Log in
-            </NavbarButton>
-            <NavbarButton variant="primary" href="signup">
-              Sign up
-            </NavbarButton>
+            {!user ? (
+              <>
+                <NavbarButton
+                  variant="secondary"
+                  href="/login"
+                  className="!text-white hover:!text-black transition-colors"
+                >
+                  Log in
+                </NavbarButton>
+                <NavbarButton variant="primary" href="/signup">
+                  Sign up
+                </NavbarButton>
+              </>
+            ) : (
+              <>
+                <NavbarButton
+                  variant="secondary"
+                  href={dashboardLink}
+                  className="!text-white hover:!text-black transition-colors"
+                >
+                  Dashboard
+                </NavbarButton>
+                <NavbarButton as="button" onClick={onLogout} variant="primary">
+                  Logout
+                </NavbarButton>
+              </>
+            )}
           </div>
         </NavBody>
 
@@ -74,23 +96,50 @@ export default function Navbar() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
+
             <div className="flex w-full flex-col gap-3 pt-2">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="secondary"
-                className="w-full"
-                href="#signin"
-              >
-                Sign in
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-                href="#signup"
-              >
-                Sign up
-              </NavbarButton>
+              {!user ? (
+                <>
+                  <NavbarButton
+                    variant="secondary"
+                    className="w-full"
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Log in
+                  </NavbarButton>
+                  <NavbarButton
+                    variant="primary"
+                    className="w-full"
+                    href="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign up
+                  </NavbarButton>
+                </>
+              ) : (
+                <>
+                  <NavbarButton
+                    variant="secondary"
+                    className="w-full"
+                    href={dashboardLink}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton
+                    as="button"
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onLogout();
+                    }}
+                  >
+                    Logout
+                  </NavbarButton>
+                </>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>
@@ -99,7 +148,7 @@ export default function Navbar() {
   );
 }
 
-/* ---------- Building blocks (JSX versions) ---------- */
+/* ---------- Building blocks ---------- */
 
 function ResizableNavbar({ children, className }) {
   const ref = useRef(null);
@@ -111,11 +160,7 @@ function ResizableNavbar({ children, className }) {
   });
 
   return (
-    <motion.div
-      ref={ref}
-      // Floating capsule center area with extra gap above; keeps space when sticky
-      className={cn("sticky top-10 z-40 mt-16 w-full", className)}
-    >
+    <motion.div ref={ref} className={cn("sticky top-10 z-40 mt-16 w-full", className)}>
       {React.Children.map(children, (child) =>
         React.isValidElement(child) ? React.cloneElement(child, { visible }) : child
       )}
@@ -165,10 +210,7 @@ function NavItems({ items = [], className, onItemClick }) {
           href={item.link}
         >
           {hovered === idx && (
-            <motion.div
-              layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-white/80"
-            />
+            <motion.div layoutId="hovered" className="absolute inset-0 h-full w-full rounded-full bg-white/80" />
           )}
           <span className="relative z-20">{item.name}</span>
         </a>
@@ -234,17 +276,18 @@ function MobileNavToggle({ isOpen, onClick }) {
   );
 }
 
-/* ✅ Updated logo source to your white Eventify logo */
+/* Logo */
 function NavbarLogo() {
   return (
     <a
-      href="home"
+      href="/"
       className="relative z-20 mr-2 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
       <img
         src="https://ik.imagekit.io/qlaegzdb2/Eventify-white.png?updatedAt=1756038031417"
         alt="Eventify logo"
-        width={150}   // ⬅️ Increased size
+
+        width={150}
         height={50}
         className="object-contain"
       />
@@ -268,7 +311,7 @@ function NavbarButton({
     primary:
       "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     secondary:
-      "bg-transparent shadow-none dark:text-white border border-white/20 hover:bg-white/20 hover:backdrop-blur-xl",
+      "bg-transparent shadow-none dark:text:white border border-white/20 hover:bg-white/20 hover:backdrop-blur-xl",
     dark:
       "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     gradient:
@@ -277,7 +320,7 @@ function NavbarButton({
 
   return (
     <Tag
-      href={href || undefined}
+      href={Tag === "a" ? href : undefined}
       className={cn(baseStyles, variantStyles[variant], className)}
       {...props}
     >
