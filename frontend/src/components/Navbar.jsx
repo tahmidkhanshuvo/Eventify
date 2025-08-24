@@ -21,10 +21,10 @@ import {
 
 export default function Navbar() {
   const navItems = [
-    { name: "Home", link: "#home" },
-    { name: "Events", link: "#events" },
-    { name: "Clubs", link: "#clubs" },
-    { name: "About Us", link: "#about" },
+    { name: "Home", link: "home" },
+    { name: "Events", link: "events" },
+    { name: "Clubs", link: "clubs" },
+    { name: "About Us", link: "about" },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -39,12 +39,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <NavbarButton
               variant="secondary"
-              href="#signin"
+              href="login"
               className="!text-white hover:!text-black transition-colors"
             >
-              Sign in
+              Log in
             </NavbarButton>
-            <NavbarButton variant="primary" href="#signup">
+            <NavbarButton variant="primary" href="signup">
               Sign up
             </NavbarButton>
           </div>
@@ -113,8 +113,8 @@ function ResizableNavbar({ children, className }) {
   return (
     <motion.div
       ref={ref}
-      // Change to "fixed" if you want it always fixed instead of sticky demo
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      // Floating capsule center area with extra gap above; keeps space when sticky
+      className={cn("sticky top-10 z-40 mt-16 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child) ? React.cloneElement(child, { visible }) : child
@@ -123,33 +123,22 @@ function ResizableNavbar({ children, className }) {
   );
 }
 
-/**
- * Glassmorphism applied here:
- * - rounded-full
- * - border + translucent bg
- * - backdrop-blur-xl
- * Visible state still narrows width & drops slightly for the resizable effect.
- */
 function NavBody({ children, className, visible }) {
   return (
     <motion.div
       animate={{
-        backdropFilter: "blur(16px)", // keep blur always for glass
+        backdropFilter: "blur(16px)",
         width: visible ? "40%" : "100%",
         y: visible ? 20 : 0,
       }}
       transition={{ type: "spring", stiffness: 200, damping: 50 }}
-      style={{ minWidth: "800px" }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start px-4 py-2 lg:flex",
-        // Glass pill background (always on)
+        "relative z-[60] mx-auto hidden w-full max-w-4xl flex-row items-center justify-between self-start px-6 py-2 lg:flex",
         "rounded-full border border-white/15 bg-white/10 backdrop-blur-xl",
-        // Dark mode glass
         "dark:border-white/10 dark:bg-neutral-900/40",
         className
       )}
     >
-      {/* Optional soft outer glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-[#7d9dd2]/10 to-[#3fc3b1]/10" />
       {children}
     </motion.div>
@@ -163,7 +152,7 @@ function NavItems({ items = [], className, onItemClick }) {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium transition duration-200 lg:flex lg:space-x-2",
         className
       )}
     >
@@ -188,14 +177,11 @@ function NavItems({ items = [], className, onItemClick }) {
   );
 }
 
-/**
- * Mobile glass pill bar as well
- */
 function MobileNav({ children, className, visible }) {
   return (
     <motion.div
       animate={{
-        backdropFilter: "blur(16px)", // keep blur for glass
+        backdropFilter: "blur(16px)",
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
@@ -205,13 +191,11 @@ function MobileNav({ children, className, visible }) {
       transition={{ type: "spring", stiffness: 200, damping: 50 }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-0 py-2 lg:hidden",
-        // Glass pill background (always on)
         "rounded-full border border-white/15 bg-white/10 backdrop-blur-xl",
         "dark:border-white/10 dark:bg-neutral-900/40",
         className
       )}
     >
-      {/* Optional soft outer glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-[#7d9dd2]/10 to-[#3fc3b1]/10" />
       {children}
     </motion.div>
@@ -219,11 +203,7 @@ function MobileNav({ children, className, visible }) {
 }
 
 function MobileNavHeader({ children, className }) {
-  return (
-    <div className={cn("flex w-full flex-row items-center justify-between", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex w-full flex-row items-center justify-between", className)}>{children}</div>;
 }
 
 function MobileNavMenu({ children, className, isOpen }) {
@@ -254,23 +234,24 @@ function MobileNavToggle({ isOpen, onClick }) {
   );
 }
 
+/* ✅ Updated logo source to your white Eventify logo */
 function NavbarLogo() {
   return (
     <a
-      href="#"
+      href="home"
       className="relative z-20 mr-2 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
       <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
-        width={40}
-        height={40}
-        className="rounded-xl"
+        src="https://ik.imagekit.io/qlaegzdb2/Eventify-white.png?updatedAt=1756038031417"
+        alt="Eventify logo"
+        width={150}   // ⬅️ Increased size
+        height={50}
+        className="object-contain"
       />
-      <span className="font-medium text-black dark:text-white">Eventify</span>
     </a>
   );
 }
+
 
 function NavbarButton({
   href,
