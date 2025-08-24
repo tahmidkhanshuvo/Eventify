@@ -7,100 +7,183 @@ import Layout from "@/components/Layout";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [ok, setOk] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    setOk("");
+
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email");
+    const password = form.get("password");
+
+    if (!email || !password) {
+      setErr("Please enter email and password.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // receive httpOnly cookie
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || "Login failed");
+
+      // Only allow Student or Organizer here
+      if (data?.role !== "Student" && data?.role !== "Organizer") {
+        // If any other role logs in, clear client state and block
+        try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        throw new Error("This login is for Students and Organizers only.");
+      }
+
+      // Optional: store token for client-only needs (cookie already set)
+      if (data?.token) localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          _id: data?._id,
+          username: data?.username,
+          email: data?.email,
+          role: data?.role,
+        })
+      );
+
+      // notify Layout/Navbar listeners
+      try { window.dispatchEvent(new Event("auth:changed")); } catch {}
+
+      // role-based redirect (Student -> /student, Organizer -> choose where)
+      const dest = data?.role === "Student" ? "/student" : "/"; // change "/" to "/organizer" if you add it
+      setOk("Logged in! Redirecting…");
+      setTimeout(() => { window.location.href = dest; }, 500);
+    } catch (e2) {
+      setErr(e2.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
       <Layout>
-      <BackgroundFX />
-    
-      <section className="relative z-10 mx-auto flex min-h-screen w-[min(560px,92%)] items-center justify-center py-12">
-        <div className="w-full">
-          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8">
-            <header className="mb-6">
-              <h1 className="text-2xl font-semibold bg-gradient-to-r from-[#7d9dd2] to-[#3fc3b1] bg-clip-text text-transparent">
-                Sign in to Eventify
-              </h1>
-              <p className="text-white/70 text-sm mt-1">
-                Welcome back! Please enter your details.
-              </p>
-            </header>
+        <BackgroundFX />
 
-            <form
-              className="space-y-5"
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Handle login
-              }}
-            >
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white/85">
-                  Email
-                </Label>
-                <Input id="email" type="email" placeholder="you@example.com" required />
-              </div>
+        <section className="relative z-10 mx-auto flex min-h-screen w-[min(560px,92%)] items-center justify-center py-12">
+          <div className="w-full">
+            <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8">
+              <header className="mb-6">
+                <h1 className="text-2xl font-semibold bg-gradient-to-r from-[#7d9dd2] to-[#3fc3b1] bg-clip-text text-transparent">
+                  Sign in to Eventify
+                </h1>
+                <p className="text-white/70 text-sm mt-1">
+                  Welcome back! Please enter your details.
+                </p>
+              </header>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-white/85">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    required
-                    className="pr-12"
-                  />
-                  <button
-                    type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/80 hover:bg-white/10"
+              <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+                {err && (
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+                    aria-live="polite"
                   >
-                    <Eye open={showPassword} />
-                  </button>
-                </div>
-              </div>
+                    {err}
+                  </div>
+                )}
+                {ok && (
+                  <div
+                    role="status"
+                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200"
+                    aria-live="polite"
+                  >
+                    {ok}
+                  </div>
+                )}
 
-              <button
-                type="submit"
-                className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-11 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)]"
-              >
-                Sign in
-              </button>
-
-              {/* Divider */}
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/10" />
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white/85">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    required
+                    className="h-12"
+                    autoComplete="email"
+                  />
                 </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-transparent px-2 text-xs text-white/60">
-                    or continue with
-                  </span>
-                </div>
-              </div>
 
-              {/* Google OAuth button (inline SVG) */}
-              <button
-                type="button"
-                onClick={() => {
-                  // Trigger Google OAuth
-                }}
-                className="h-11 w-full rounded-xl bg-white text-gray-900 hover:bg-white/90 transition-all hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
-              >
-                <GoogleGlyph />
-                <span className="font-medium">Continue with Google</span>
-              </button>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white/85">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                      className="h-12 pr-12"
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/80 hover:bg-white/10"
+                    >
+                      <Eye open={showPassword} />
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-11 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)] disabled:opacity-60"
+                >
+                  {loading ? "Signing in…" : "Sign in"}
+                </button>
+
+                {/* Divider */}
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-transparent px-2 text-xs text-white/60">or continue with</span>
+                  </div>
+                </div>
+
+                {/* Google OAuth button (stub) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    // If you add Google OAuth backend: window.location.href = "/api/auth/google"
+                  }}
+                  className="h-11 w-full rounded-xl bg-white text-gray-900 hover:bg-white/90 transition-all hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
+                >
+                  <GoogleGlyph />
+                  <span className="font-medium">Continue with Google</span>
+                </button>
+              </form>
+            </div>
+
+            <p className="mt-6 text-center text-xs text-white/60">
+              © {new Date().getFullYear()} Eventify. All rights reserved.
+            </p>
           </div>
-
-          <p className="mt-6 text-center text-xs text-white/60">
-            © {new Date().getFullYear()} Eventify. All rights reserved.
-          </p>
-        </div> 
-      </section> </Layout>
-    </main> 
+        </section>
+      </Layout>
+    </main>
   );
 }
 
@@ -125,29 +208,9 @@ function BackgroundFX() {
 
       {/* animated vignette */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,transparent,rgba(0,0,0,0.65))]" />
-
-      <style jsx global>{`
-        @keyframes float-slow {
-          0% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(20px, -10px) scale(1.05); }
-          100% { transform: translate(0, 0) scale(1); }
-        }
-        @keyframes float-slower {
-          0% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-16px, 12px) scale(1.07); }
-          100% { transform: translate(0, 0) scale(1); }
-        }
-        @keyframes rotate-slower {
-          from { transform: translate(-50%, -50%) rotate(0deg); }
-          to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        .animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
-        .animate-float-slower { animation: float-slower 22s ease-in-out infinite; }
-        .animate-rotate-slower { animation: rotate-slower 36s linear infinite; }
-      `}</style> 
-    </> 
-  ); 
-} 
+    </>
+  );
+}
 
 /* ------- tiny inline icons ------- */
 function Eye({ open }) {

@@ -11,23 +11,25 @@ import {
 } from "motion/react";
 
 /**
- * components/Navbar.jsx
- * Resizable navbar with glassmorphism:
- * - Fully rounded pill container with backdrop blur + translucent background
- * - Centered nav items with soft hover highlight
- * - Right-side auth buttons (Sign in / Sign up)
- * - Mobile header with hamburger + drawer
+ * Navbar (auth-aware)
+ * - Shows Log in / Sign up when logged out
+ * - Shows Dashboard + Logout when logged in
+ * - Mobile drawer includes the same actions
  */
-
-export default function Navbar() {
+export default function Navbar({ user, onLogout = () => {} }) {
   const navItems = [
-    { name: "Home", link: "#home" },
-    { name: "Events", link: "#events" },
-    { name: "Clubs", link: "#clubs" },
-    { name: "About Us", link: "#about" },
+    { name: "Home", link: "/" },
+    { name: "Events", link: "/events" },
+    { name: "Clubs", link: "/clubs" },
+    { name: "About Us", link: "/aboutus" },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const dashboardLink =
+    user?.role === "Student" ? "/student" :
+    user?.role === "Super Admin" ? "/admin" :
+    "/";
 
   return (
     <div className="relative w-full">
@@ -37,16 +39,37 @@ export default function Navbar() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-3">
-            <NavbarButton
-              variant="secondary"
-              href="#signin"
-              className="!text-white hover:!text-black transition-colors"
-            >
-              Sign in
-            </NavbarButton>
-            <NavbarButton variant="primary" href="#signup">
-              Sign up
-            </NavbarButton>
+            {!user ? (
+              <>
+                <NavbarButton
+                  variant="secondary"
+                  href="/login"
+                  className="!text-white hover:!text-black transition-colors"
+                >
+                  Log in
+                </NavbarButton>
+                <NavbarButton variant="primary" href="/signup">
+                  Sign up
+                </NavbarButton>
+              </>
+            ) : (
+              <>
+                <NavbarButton
+                  variant="secondary"
+                  href={dashboardLink}
+                  className="!text-white hover:!text-black transition-colors"
+                >
+                  Dashboard
+                </NavbarButton>
+                <NavbarButton
+                  as="button"
+                  onClick={onLogout}
+                  variant="primary"
+                >
+                  Logout
+                </NavbarButton>
+              </>
+            )}
           </div>
         </NavBody>
 
@@ -74,23 +97,50 @@ export default function Navbar() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
+
             <div className="flex w-full flex-col gap-3 pt-2">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="secondary"
-                className="w-full"
-                href="#signin"
-              >
-                Sign in
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-                href="#signup"
-              >
-                Sign up
-              </NavbarButton>
+              {!user ? (
+                <>
+                  <NavbarButton
+                    variant="secondary"
+                    className="w-full"
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Log in
+                  </NavbarButton>
+                  <NavbarButton
+                    variant="primary"
+                    className="w-full"
+                    href="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign up
+                  </NavbarButton>
+                </>
+              ) : (
+                <>
+                  <NavbarButton
+                    variant="secondary"
+                    className="w-full"
+                    href={dashboardLink}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton
+                    as="button"
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onLogout();
+                    }}
+                  >
+                    Logout
+                  </NavbarButton>
+                </>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>
@@ -99,7 +149,7 @@ export default function Navbar() {
   );
 }
 
-/* ---------- Building blocks (JSX versions) ---------- */
+/* ---------- Building blocks ---------- */
 
 function ResizableNavbar({ children, className }) {
   const ref = useRef(null);
@@ -113,8 +163,7 @@ function ResizableNavbar({ children, className }) {
   return (
     <motion.div
       ref={ref}
-      // Change to "fixed" if you want it always fixed instead of sticky demo
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      className={cn("sticky top-10 z-40 mt-16 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child) ? React.cloneElement(child, { visible }) : child
@@ -123,33 +172,22 @@ function ResizableNavbar({ children, className }) {
   );
 }
 
-/**
- * Glassmorphism applied here:
- * - rounded-full
- * - border + translucent bg
- * - backdrop-blur-xl
- * Visible state still narrows width & drops slightly for the resizable effect.
- */
 function NavBody({ children, className, visible }) {
   return (
     <motion.div
       animate={{
-        backdropFilter: "blur(16px)", // keep blur always for glass
+        backdropFilter: "blur(16px)",
         width: visible ? "40%" : "100%",
         y: visible ? 20 : 0,
       }}
       transition={{ type: "spring", stiffness: 200, damping: 50 }}
-      style={{ minWidth: "800px" }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start px-4 py-2 lg:flex",
-        // Glass pill background (always on)
+        "relative z-[60] mx-auto hidden w-full max-w-4xl flex-row items-center justify-between self-start px-6 py-2 lg:flex",
         "rounded-full border border-white/15 bg-white/10 backdrop-blur-xl",
-        // Dark mode glass
         "dark:border-white/10 dark:bg-neutral-900/40",
         className
       )}
     >
-      {/* Optional soft outer glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-[#7d9dd2]/10 to-[#3fc3b1]/10" />
       {children}
     </motion.div>
@@ -163,7 +201,7 @@ function NavItems({ items = [], className, onItemClick }) {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium transition duration-200 lg:flex lg:space-x-2",
         className
       )}
     >
@@ -188,14 +226,11 @@ function NavItems({ items = [], className, onItemClick }) {
   );
 }
 
-/**
- * Mobile glass pill bar as well
- */
 function MobileNav({ children, className, visible }) {
   return (
     <motion.div
       animate={{
-        backdropFilter: "blur(16px)", // keep blur for glass
+        backdropFilter: "blur(16px)",
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
@@ -205,13 +240,11 @@ function MobileNav({ children, className, visible }) {
       transition={{ type: "spring", stiffness: 200, damping: 50 }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-0 py-2 lg:hidden",
-        // Glass pill background (always on)
         "rounded-full border border-white/15 bg-white/10 backdrop-blur-xl",
         "dark:border-white/10 dark:bg-neutral-900/40",
         className
       )}
     >
-      {/* Optional soft outer glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-[#7d9dd2]/10 to-[#3fc3b1]/10" />
       {children}
     </motion.div>
@@ -219,11 +252,7 @@ function MobileNav({ children, className, visible }) {
 }
 
 function MobileNavHeader({ children, className }) {
-  return (
-    <div className={cn("flex w-full flex-row items-center justify-between", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex w-full flex-row items-center justify-between", className)}>{children}</div>;
 }
 
 function MobileNavMenu({ children, className, isOpen }) {
@@ -254,20 +283,20 @@ function MobileNavToggle({ isOpen, onClick }) {
   );
 }
 
+/* Logo */
 function NavbarLogo() {
   return (
     <a
-      href="#"
+      href="/"
       className="relative z-20 mr-2 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
       <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
-        width={40}
-        height={40}
-        className="rounded-xl"
+        src="https://ik.imagekit.io/qlaegzdb2/Eventify-white.png?updatedAt=1756038031417"
+        alt="Eventify logo"
+        width={150}
+        height={50}
+        className="object-contain"
       />
-      <span className="font-medium text-black dark:text-white">Eventify</span>
     </a>
   );
 }
@@ -296,7 +325,7 @@ function NavbarButton({
 
   return (
     <Tag
-      href={href || undefined}
+      href={Tag === "a" ? href : undefined}
       className={cn(baseStyles, variantStyles[variant], className)}
       {...props}
     >
