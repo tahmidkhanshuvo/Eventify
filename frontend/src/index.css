@@ -66,8 +66,15 @@
   --font-sora-600: "Sora", sans-serif;
   --font-sora-700: "Sora", sans-serif;
   --font-sora-800: "Sora", sans-serif;
+  --color-primary: #5d429a;   /* purple */
+  --color-secondary: #7d9dd2; /* blue */
+  --color-accent: #5fc3b1;    /* teal */
 }
-
+@theme {
+  --color-primary: #5d429a;   /* purple */
+  --color-secondary: #7d9dd2; /* blue */
+  --color-accent: #5fc3b1;    /* teal */
+}
 /*
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

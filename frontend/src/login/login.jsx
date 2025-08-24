@@ -77,7 +77,7 @@ export default function LoginPage() {
           Photo by Alexandr Popadin
         </div>
       </div>
-<div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 sm:p-8 md:p-12">
+    <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 sm:p-8 md:p-12">
     <div className="w-full max-w-sm mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
