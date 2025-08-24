@@ -15,7 +15,7 @@ import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
 
 export default function App() {
   return (
-    <div className="fixed inset-0 overflow-hidden bg-neutral-950 text-white">
+    <div>
       {/* Background stays always */}
       <BackgroundFX />
 

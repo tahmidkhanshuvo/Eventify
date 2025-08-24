@@ -1,214 +1,177 @@
+"use client";
+
 import React, { useState } from "react";
-import { Switch } from "@mui/material";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import Layout from "@/components/Layout";
 
-// SVG Icons (LogoIcon, GoogleIcon, EyeIcon)
-const LogoIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="20" cy="20" r="20" fill="url(#paint0_linear_1_2)" />
-    <defs>
-      <linearGradient id="paint0_linear_1_2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#FFC700" />
-        <stop offset="1" stopColor="#A259FF" />
-      </linearGradient>
-    </defs>
-  </svg>
-);
-
-const GoogleIcon = () => (
-  <svg className="w-6 h-6" viewBox="0 0 24 24">
-    <path
-      fill="white"
-      d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5.03,16.48 5.03,12.55C5.03,8.62 8.36,5.82 12.19,5.82C14.04,5.82 15.33,6.57 16.18,7.38L18.23,5.49C16.5,4 14.47,3 12.19,3C7.38,3 3.37,7.03 3.37,12.55C3.37,18.07 7.38,22.1 12.19,22.1C17.01,22.1 21.54,18.49 21.54,12.79C21.54,12.03 21.48,11.53 21.35,11.1Z"
-    />
-  </svg>
-);
-
-const EyeIcon = ({ visible }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 text-gray-400 cursor-pointer"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    {visible ? (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-      />
-    ) : (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-1.292-1.292"
-      />
-    )}
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 5.5A6.5 6.5 0 0118.5 12 6.5 6.5 0 0112 18.5 6.5 6.5 0 015.5 12 6.5 6.5 0 0112 5.5z"
-    />
-  </svg>
-);
-
-export default function LoginPage() {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
+export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="w-full min-h-screen flex flex-col lg:flex-row font-sans">
-      <div className="w-full lg:w-1/2 h-64 lg:h-screen relative">
-        <img
-          className="object-cover w-full h-full"
-          src="https://media.istockphoto.com/id/1465441739/photo/romantic-night-scene.jpg?s=612x612&w=0&k=20&c=gt2thGqqfyvlEd4BkvFfG7ca8Jq_rUeFZhTg_bOh6cU="
-          alt="A sailboat on the water near a lighthouse"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "https://placehold.co/1000x1200/a7d8de/ffffff?text=Scenic+View";
-          }}
-        />
-        <div className="absolute bottom-4 left-4 text-white text-xs sm:text-sm bg-black bg-opacity-30 p-2 rounded">
-          Photo by Alexandr Popadin
-        </div>
-      </div>
-    <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 sm:p-8 md:p-12">
-    <div className="w-full max-w-sm mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <LogoIcon />
-            <span className="text-lg sm:text-xl font-sora-300 text-gray-800">
-                UI Unicorn
-            </span>
-        </div>
+    <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+      <Layout>
+      <BackgroundFX />
+    
+      <section className="relative z-10 mx-auto flex min-h-screen w-[min(560px,92%)] items-center justify-center py-12">
+        <div className="w-full">
+          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8">
+            <header className="mb-6">
+              <h1 className="text-2xl font-semibold bg-gradient-to-r from-[#7d9dd2] to-[#3fc3b1] bg-clip-text text-transparent">
+                Sign in to Eventify
+              </h1>
+              <p className="text-white/70 text-sm mt-1">
+                Welcome back! Please enter your details.
+              </p>
+            </header>
 
-        <h2 className="text-2xl sm:text-3xl font-sora-500 text-gray-900 mb-6 sm:mb-8">
-            Nice to see you again
-        </h2>
+            <form
+              className="space-y-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Handle login
+              }}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white/85">
+                  Email
+                </Label>
+                <Input id="email" type="email" placeholder="you@example.com" required />
+              </div>
 
-        {/* Form */}
-        <form className="space-y-5 sm:space-y-6">
-            <div>
-                <label
-                    htmlFor="email"
-                    className="px-2 block text-sm font-medium text-gray-700 mb-1"
-                >
-                    Login
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Email or phone number"
-                    className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-                />
-            </div>
-            <div className="relative">
-                <label
-                    htmlFor="password"
-                    className="px-2 block text-sm font-medium text-gray-700 mb-1"
-                >
-                    Password
-                </label>
-                <input
-                    type={passwordVisible ? "text" : "password"}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white/85">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
                     id="password"
-                    placeholder="Enter password"
-                    className="w-full px-4 py-3 bg-gray-100 border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-                />
-                <div
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center top-7"
-                    onClick={togglePasswordVisibility}
-                >
-                    <EyeIcon visible={passwordVisible} />
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    required
+                    className="pr-12"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/80 hover:bg-white/10"
+                  >
+                    <Eye open={showPassword} />
+                  </button>
                 </div>
-            </div>
+              </div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm gap-3 sm:gap-0">
-                <div className="flex items-center gap-2">
-                    <Switch
-                        size="sm"
-                        color="primary"
-                        variant="outlined"
-                        id="remember-me"
-                        slotProps={{ input: { 'aria-label': 'Remember me' } }}
-                    />
-                    <label htmlFor="remember-me" className="text-gray-900 font-sora">
-                        Remember me
-                    </label>
-                </div>
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                    Forgot password?
-                </a>
-            </div>
-
-            {/* Submit Buttons */}
-            <button
+              <button
                 type="submit"
-                className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
-            >
+                className="w-full select-none rounded-xl bg-gradient-to-r from-[#3fc3b1] to-[#7d9dd2] text-white font-semibold h-11 transition-all hover:-translate-y-0.5 shadow-[0_0_22px_rgba(63,195,177,0.45)] hover:shadow-[0_0_34px_rgba(63,195,177,0.6)]"
+              >
                 Sign in
-            </button>
+              </button>
 
-            <hr className="h-px bg-gray-200 border-0 dark:bg-gray-300" />
-            <button
+              {/* Divider */}
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-transparent px-2 text-xs text-white/60">
+                    or continue with
+                  </span>
+                </div>
+              </div>
+
+              {/* Google OAuth button (inline SVG) */}
+              <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300"
-            >
-                <GoogleIcon />
-                sign in with Google
-            </button>
-        </form>
+                onClick={() => {
+                  // Trigger Google OAuth
+                }}
+                className="h-11 w-full rounded-xl bg-white text-gray-900 hover:bg-white/90 transition-all hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
+              >
+                <GoogleGlyph />
+                <span className="font-medium">Continue with Google</span>
+              </button>
+            </form>
+          </div>
 
-        {/* Sign up link */}
-        <p className="text-center text-sm text-gray-600 mt-8">
-            Don't have an account?{" "}
-            <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up now
-            </a>
-        </p>
+          <p className="mt-6 text-center text-xs text-white/60">
+            © {new Date().getFullYear()} Eventify. All rights reserved.
+          </p>
+        </div> 
+      </section> </Layout>
+    </main> 
+  );
+}
 
-        {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-10 sm:mt-12 text-xs text-gray-500 gap-2 sm:gap-0">
-            <div className="flex items-center gap-2">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 40 40"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <circle
-                        cx="20"
-                        cy="20"
-                        r="20"
-                        fill="url(#paint0_linear_footer)"
-                    />
-                    <defs>
-                        <linearGradient
-                            id="paint0_linear_footer"
-                            x1="0"
-                            y1="0"
-                            x2="40"
-                            y2="40"
-                            gradientUnits="userSpaceOnUse"
-                        >
-                            <stop stopColor="#FFC700" />
-                            <stop offset="1" stopColor="#A259FF" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>uiunicorn.com</span>
-            </div>
-            <span>© Perfect Login 2021</span>
-        </div>
-    </div>
-</div>
-    </div>
+/* ------- Background animation ------- */
+function BackgroundFX() {
+  return (
+    <>
+      {/* base gradient wash */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_600px_at_10%_-10%,#7d9dd2_12%,transparent_60%),radial-gradient(1000px_600px_at_90%_-10%,#3fc3b1_12%,transparent_60%)] opacity-30" />
+
+      {/* soft moving blobs */}
+      <div className="pointer-events-none absolute -top-40 -left-32 h-[36rem] w-[36rem] rounded-full bg-[#7d9dd2]/25 blur-3xl animate-float-slow" />
+      <div className="pointer-events-none absolute -top-32 -right-32 h-[32rem] w-[32rem] rounded-full bg-[#3fc3b1]/25 blur-3xl animate-float-slower" />
+
+      {/* rotating conic sheen */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.22]">
+        <div className="absolute left-1/2 top-1/2 h-[160vmax] w-[160vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_0deg,rgba(125,157,210,0.25),transparent_30%,rgba(63,195,177,0.25),transparent_70%)] animate-rotate-slower" />
+      </div>
+
+      {/* subtle grid overlay */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-screen [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:36px_36px]" />
+
+      {/* animated vignette */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,transparent,rgba(0,0,0,0.65))]" />
+
+      <style jsx global>{`
+        @keyframes float-slow {
+          0% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(20px, -10px) scale(1.05); }
+          100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes float-slower {
+          0% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-16px, 12px) scale(1.07); }
+          100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes rotate-slower {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
+        .animate-float-slower { animation: float-slower 22s ease-in-out infinite; }
+        .animate-rotate-slower { animation: rotate-slower 36s linear infinite; }
+      `}</style> 
+    </> 
+  ); 
+} 
+
+/* ------- tiny inline icons ------- */
+function Eye({ open }) {
+  return open ? (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M2.3 12S5.5 5 12 5s9.7 7 9.7 7-3.2 7-9.7 7S2.3 12 2.3 12Z" />
+      <circle cx="12" cy="12" r="3.5" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 3l18 18" />
+      <path d="M9.9 5.2A9.8 9.8 0 0 1 12 5c6.5 0 9.7 7 9.7 7a16 16 0 0 1-3.1 4.4M6.1 6.3A16 16 0 0 0 2.3 12S5.5 19 12 19c1.3 0 2.5-.2 3.6-.6" />
+      <path d="M9.1 9.1A3.5 3.5 0 0 0 12 15.5c.5 0 .9-.1 1.3-.3" />
+    </svg>
+  );
+}
+
+function GoogleGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <path
+        d="M12.24 10.285v3.59h5.953c-.26 1.52-1.795 4.457-5.953 4.457-3.586 0-6.516-2.97-6.516-6.629s2.93-6.63 6.516-6.63c2.045 0 3.418.87 4.203 1.62l2.86-2.76C17.5 2.31 15.12 1.2 12.24 1.2 6.99 1.2 2.7 5.49 2.7 10.703c0 5.213 4.29 9.503 9.54 9.503 5.51 0 9.15-3.867 9.15-9.32 0-.63-.07-1.11-.16-1.6H12.24z"
+        fill="#4285F4"
+      />
+    </svg>
   );
 }
