@@ -36,7 +36,7 @@ const Layout = ({ children }) => {
     } catch {}
   };
 
-  // ✨ NEW: Hydrate from cookie on initial load (if localStorage is empty)
+  // Hydrate from cookie on initial load (if localStorage is empty)
   useEffect(() => {
     let aborted = false;
 
@@ -48,7 +48,7 @@ const Layout = ({ children }) => {
         const res = await fetch("/api/auth/me", {
           method: "GET",
           credentials: "include",
-          headers: { "Accept": "application/json" },
+          headers: { Accept: "application/json" },
         });
 
         if (!res.ok) return; // not logged in; do nothing
@@ -59,7 +59,7 @@ const Layout = ({ children }) => {
         // Persist minimal state; token is httpOnly, but we set a harmless flag
         localStorage.setItem("user", JSON.stringify(me));
         if (!localStorage.getItem("token")) {
-          // This is just a presence flag for your route guard; API still uses the cookie.
+          // Presence flag for route guards; API still uses the cookie.
           localStorage.setItem("token", "cookie");
         }
 
@@ -89,9 +89,9 @@ const Layout = ({ children }) => {
       emitAuthChanged();
       setUser(null);
 
-      // Nudge user to login if they were on a protected page
+      // If user was on a protected area, send to login.
       const path = window.location.pathname;
-      if (path.startsWith("/student") || path.startsWith("/admin")) {
+      if (path.startsWith("/student") || path.startsWith("/organizers") || path.startsWith("/admin")) {
         window.location.href = "/login";
       } else {
         // Soft refresh to update any auth-conditional UI
@@ -102,7 +102,7 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      {/* Pass user + logout to Navbar; if Navbar doesn't use them yet, no breakage */}
+      {/* Pass user + logout to Navbar */}
       <Navbar user={user} onLogout={handleLogout} />
 
       <Box

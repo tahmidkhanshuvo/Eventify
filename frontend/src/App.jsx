@@ -17,13 +17,23 @@ import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
 import Events from "./navbar/Events.jsx";
-import Student from "./dashboard/Student.jsx";
 
-// ⬇️ use your actual files in /SuperAdmin
+// Dashboards (layouts that render <Outlet/>)
+import Student from "./dashboard/Student.jsx";
+import Organizer from "./dashboard/Organizer.jsx";
+
+// Pages used inside dashboards
+import AllEvents from "./Pages/All_events.jsx";
+import MyEvents from "./Pages/My_events.jsx";
+import CreateEvents from "./Pages/Create_events.jsx";
+import ProfilePage from "./Pages/Profilepage.jsx";
+
+// Super Admin (leave as-is per your note)
 import SuperAdmin from "./SuperAdmin/SuperAdmin.jsx";
 import SuperAdminLogin from "./SuperAdmin/SuperAdminLogin.jsx";
 
-
+// Logout page
+import Logout from "./Pages/Logout.jsx";
 
 function AppInner() {
   const location = useLocation();
@@ -63,6 +73,19 @@ function AppInner() {
     };
   }, []);
 
+  function PageLoader() {
+    return (
+      <div className="grid min-h-[60vh] place-items-center text-white/80">
+        <div className="flex items-center gap-3">
+          <span className="h-3 w-3 animate-pulse rounded-full bg-white/60" />
+          <span className="h-3 w-3 animate-pulse rounded-full bg-white/60 [animation-delay:150ms]" />
+          <span className="h-3 w-3 animate-pulse rounded-full bg-white/60 [animation-delay:300ms]" />
+          <span className="ml-2">checking session…</span>
+        </div>
+      </div>
+    );
+  }
+
   function ProtectedRoute({ children, roles }) {
     if (me.loading) return <PageLoader />;
     if (!me.user) return <Navigate to="/login" replace />;
@@ -76,8 +99,7 @@ function AppInner() {
     return children;
   }
 
-  // Allow accessing the admin-login page even if a non-admin is logged in.
-  // If a Super Admin is already logged in, send them straight to /admin.
+  // Keep this exactly as-is for your separate Super Admin portal
   function AdminPortalGate({ children }) {
     if (me.loading) return <PageLoader />;
     if (me.user?.role === "Super Admin") return <Navigate to="/admin" replace />;
@@ -96,7 +118,7 @@ function AppInner() {
           <Route path="/clubs" element={<Layout><Club /></Layout>} />
           <Route path="/events" element={<Layout><Events /></Layout>} />
 
-          {/* Auth pages (these already include their own Layouts if any) */}
+          {/* Auth pages */}
           <Route
             path="/login"
             element={
@@ -114,7 +136,7 @@ function AppInner() {
             }
           />
 
-          {/* Super Admin login (separate portal) */}
+          {/* Super Admin login (kept separate) */}
           <Route
             path="/admin-login"
             element={
@@ -124,7 +146,9 @@ function AppInner() {
             }
           />
 
-          {/* Protected routes */}
+          {/* ---------- Protected, nested dashboards ---------- */}
+
+          {/* Student area */}
           <Route
             path="/student"
             element={
@@ -132,7 +156,30 @@ function AppInner() {
                 <Student />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Navigate to="allevents" replace />} />
+            <Route path="allevents" element={<AllEvents />} />
+            <Route path="myevents" element={<MyEvents />} />
+            <Route path="myprofile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Organizer area */}
+          <Route
+            path="/organizers"
+            element={
+              <ProtectedRoute roles={["Organizer"]}>
+                <Organizer />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="create-event" replace />} />
+            <Route path="allevents" element={<AllEvents />} />
+            <Route path="myevents" element={<MyEvents />} />
+            <Route path="create-event" element={<CreateEvents />} />
+            <Route path="myprofile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Super Admin area (untouched) */}
           <Route
             path="/admin"
             element={
@@ -142,22 +189,12 @@ function AppInner() {
             }
           />
 
+          {/* Logout */}
+          <Route path="/logout" element={<Logout />} />
+
           {/* fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
-    </div>
-  );
-}
-
-function PageLoader() {
-  return (
-    <div className="grid min-h-[60vh] place-items-center text-white/80">
-      <div className="flex items-center gap-3">
-        <span className="h-3 w-3 animate-pulse rounded-full bg-white/60" />
-        <span className="h-3 w-3 animate-pulse rounded-full bg-white/60 [animation-delay:150ms]" />
-        <span className="h-3 w-3 animate-pulse rounded-full bg-white/60 [animation-delay:300ms]" />
-        <span className="ml-2">checking session…</span>
       </div>
     </div>
   );

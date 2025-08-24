@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 
 export default function Signup() {
+  const [role, setRole] = useState("student"); // "student" | "organizer"
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,23 +26,42 @@ export default function Signup() {
       return;
     }
 
-    // map UI fields -> backend payload
-    const payload = {
-      fullName: form.get("fullName"),
-      username: form.get("username"),
-      email: form.get("email"),
-      password: pwd,
-      phoneNumber: form.get("phone"),
-      address: form.get("city"),            // using City as address for now
-      university: form.get("university"),
-      department: form.get("department"),
-      academicYear: form.get("year"),
-      studentId: form.get("studentId"),
-    };
+    let payload;
+    let endpoint;
+
+    if (role === "student") {
+      payload = {
+        fullName: form.get("fullName"),
+        username: form.get("username"),
+        email: form.get("email"),
+        password: pwd,
+        phoneNumber: form.get("phone"),
+        address: form.get("city"), // City -> address
+        university: form.get("university"),
+        department: form.get("department"),
+        academicYear: form.get("year"),
+        studentId: form.get("studentId"),
+      };
+      endpoint = "/api/auth/register/student";
+    } else {
+      payload = {
+        fullName: form.get("fullName"),
+        username: form.get("username"),
+        email: form.get("email"),
+        password: pwd,
+        phoneNumber: form.get("phone"),
+        address: form.get("city"), // City -> address
+        university: form.get("university"),
+        clubName: form.get("clubName"),
+        clubPosition: form.get("clubPosition"),
+        clubWebsite: form.get("clubWebsite") || undefined, // optional
+      };
+      endpoint = "/api/auth/register/organizer";
+    }
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register/student", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -53,11 +73,16 @@ export default function Signup() {
         throw new Error(data?.message || "Signup failed");
       }
 
-      // If your backend returns token, store it; otherwise you can remove this.
       if (data?.token) localStorage.setItem("token", data.token);
 
-      setOk("Account created! Redirecting to login…");
-      // small pause then go to login (adjust if you want to go to dashboard)
+      const successText =
+        data?.message ||
+        (role === "organizer"
+          ? "Registration submitted! Your organizer account is pending approval. Redirecting to login…"
+          : "Account created! Redirecting to login…");
+
+      setOk(successText);
+
       setTimeout(() => {
         window.location.href = "/login";
       }, 800);
@@ -89,7 +114,39 @@ export default function Signup() {
                 </p>
               </header>
 
+              {/* Role toggle */}
+              <div className="mb-6 flex items-center justify-center">
+                <div className="inline-flex rounded-2xl bg-white/10 p-1 backdrop-blur-md border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setRole("student")}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                      role === "student"
+                        ? "bg-white text-black"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                    aria-pressed={role === "student"}
+                  >
+                    Student
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole("organizer")}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                      role === "organizer"
+                        ? "bg-white text-black"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                    aria-pressed={role === "organizer"}
+                  >
+                    Organizer
+                  </button>
+                </div>
+              </div>
+
               <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+                <input type="hidden" name="role" value={role} />
+
                 {err && (
                   <div
                     role="alert"
@@ -114,86 +171,210 @@ export default function Signup() {
                   <Label htmlFor="fullName" className="text-white/85">
                     Full Name
                   </Label>
-                  <Input id="fullName" name="fullName" placeholder="Alex Johnson" required className="h-12" />
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Alex Johnson"
+                    required
+                    className="h-12"
+                  />
                 </div>
 
                 {/* Email, Username */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white/85">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="you@example.com" required className="h-12" autoComplete="email" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="username" className="text-white/85">Username</Label>
-                    <Input id="username" name="username" placeholder="eventify_user" required className="h-12" />
-                  </div>
-                </div>
-
-                {/* Phone, Student ID */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-white/85">Phone</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="+8801XXXXXXXXX" required className="h-12" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="studentId" className="text-white/85">Student ID</Label>
-                    <Input id="studentId" name="studentId" placeholder="2025-00000" required className="h-12" />
-                  </div>
-                </div>
-
-                {/* Department, City */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="department" className="text-white/85">Department</Label>
-                    <select
-                      id="department"
-                      name="department"
+                    <Label htmlFor="email" className="text-white/85">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="you@example.com"
                       required
-                      className="h-12 w-full rounded-md bg-white/90 text-gray-900 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#3fc3b1]"
-                    >
-                      <option value="">Select department</option>
-                      <option>CSE</option>
-                      <option>EEE</option>
-                      <option>ECE</option>
-                      <option>BBA</option>
-                      <option>Architecture</option>
-                      <option>Others</option>
-                    </select>
+                      className="h-12"
+                      autoComplete="email"
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city" className="text-white/85">City</Label>
-                    <Input id="city" name="city" placeholder="Dhaka" required className="h-12" />
+                    <Label htmlFor="username" className="text-white/85">
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      name="username"
+                      placeholder="eventify_user"
+                      required
+                      className="h-12"
+                    />
                   </div>
                 </div>
 
-                {/* Year, University */}
+                {/* Phone + (Student ID | Club Name) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="year" className="text-white/85">Year</Label>
-                    <select
-                      id="year"
-                      name="year"
+                    <Label htmlFor="phone" className="text-white/85">
+                      Phone
+                    </Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+8801XXXXXXXXX"
                       required
-                      className="h-12 w-full rounded-md bg-white/90 text-gray-900 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#3fc3b1]"
-                    >
-                      <option value="">Select year</option>
-                      <option>1st Year</option>
-                      <option>2nd Year</option>
-                      <option>3rd Year</option>
-                      <option>4th Year</option>
-                      <option>Masters</option>
-                    </select>
+                      className="h-12"
+                    />
                   </div>
+
+                  {role === "student" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="studentId" className="text-white/85">
+                        Student ID
+                      </Label>
+                      <Input
+                        id="studentId"
+                        name="studentId"
+                        placeholder="2025-00000"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="clubName" className="text-white/85">
+                        Club Name
+                      </Label>
+                      <Input
+                        id="clubName"
+                        name="clubName"
+                        placeholder="e.g., Robotics Club"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* (Department | Club Position) + City */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {role === "student" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="department" className="text-white/85">
+                        Department
+                      </Label>
+                      <select
+                        id="department"
+                        name="department"
+                        required
+                        className="h-12 w-full rounded-md bg-white/90 text-gray-900 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#3fc3b1]"
+                      >
+                        <option value="">Select department</option>
+                        <option>CSE</option>
+                        <option>EEE</option>
+                        <option>ECE</option>
+                        <option>BBA</option>
+                        <option>Architecture</option>
+                        <option>Others</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="clubPosition" className="text-white/85">
+                        Club Position
+                      </Label>
+                      <Input
+                        id="clubPosition"
+                        name="clubPosition"
+                        placeholder="e.g., President / Coordinator"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                  )}
+
                   <div className="space-y-2">
-                    <Label htmlFor="university" className="text-white/85">University Name</Label>
-                    <Input id="university" name="university" placeholder="e.g., Daffodil International University" required className="h-12" />
+                    <Label htmlFor="city" className="text-white/85">
+                      City
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      placeholder="Dhaka"
+                      required
+                      className="h-12"
+                    />
                   </div>
                 </div>
+
+                {/* Year + University (student) OR University + (optional) Club Website (organizer) */}
+                {role === "student" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="year" className="text-white/85">
+                        Year
+                      </Label>
+                      <select
+                        id="year"
+                        name="year"
+                        required
+                        className="h-12 w-full rounded-md bg-white/90 text-gray-900 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#3fc3b1]"
+                      >
+                        <option value="">Select year</option>
+                        <option>1st Year</option>
+                        <option>2nd Year</option>
+                        <option>3rd Year</option>
+                        <option>4th Year</option>
+                        <option>Masters</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="university" className="text-white/85">
+                        University Name
+                      </Label>
+                      <Input
+                        id="university"
+                        name="university"
+                        placeholder="e.g., Daffodil International University"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="university" className="text-white/85">
+                        University Name
+                      </Label>
+                      <Input
+                        id="university"
+                        name="university"
+                        placeholder="e.g., Daffodil International University"
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="clubWebsite" className="text-white/85">
+                        Club Website (optional)
+                      </Label>
+                      <Input
+                        id="clubWebsite"
+                        name="clubWebsite"
+                        type="url"
+                        placeholder="https://example.com"
+                        className="h-12"
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* Passwords */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-white/85">Password</Label>
+                    <Label htmlFor="password" className="text-white/85">
+                      Password
+                    </Label>
                     <div className="relative">
                       <Input
                         id="password"
@@ -216,7 +397,9 @@ export default function Signup() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirm" className="text-white/85">Confirm password</Label>
+                    <Label htmlFor="confirm" className="text-white/85">
+                      Confirm password
+                    </Label>
                     <div className="relative">
                       <Input
                         id="confirm"
@@ -251,7 +434,8 @@ export default function Signup() {
             </div>
 
             <p className="mt-20 text-center text-xl text-white/60">Join us today.</p>
-            <br /><br />
+            <br />
+            <br />
           </div>
         </section>
       </Layout>

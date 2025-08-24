@@ -26,10 +26,13 @@ export default function Navbar({ user, onLogout = () => {} }) {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Updated: Student -> /student, Organizer -> /organizers, else /
   const dashboardLink =
-    user?.role === "Student" ? "/student" :
-    user?.role === "Super Admin" ? "/admin" :
-    "/";
+    user?.role === "Student"
+      ? "/student"
+      : user?.role === "Organizer"
+      ? "/organizers"
+      : "/";
 
   return (
     <div className="relative w-full">
@@ -61,11 +64,7 @@ export default function Navbar({ user, onLogout = () => {} }) {
                 >
                   Dashboard
                 </NavbarButton>
-                <NavbarButton
-                  as="button"
-                  onClick={onLogout}
-                  variant="primary"
-                >
+                <NavbarButton as="button" onClick={onLogout} variant="primary">
                   Logout
                 </NavbarButton>
               </>
@@ -161,10 +160,7 @@ function ResizableNavbar({ children, className }) {
   });
 
   return (
-    <motion.div
-      ref={ref}
-      className={cn("sticky top-10 z-40 mt-16 w-full", className)}
-    >
+    <motion.div ref={ref} className={cn("sticky top-10 z-40 mt-16 w-full", className)}>
       {React.Children.map(children, (child) =>
         React.isValidElement(child) ? React.cloneElement(child, { visible }) : child
       )}
@@ -214,10 +210,7 @@ function NavItems({ items = [], className, onItemClick }) {
           href={item.link}
         >
           {hovered === idx && (
-            <motion.div
-              layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-white/80"
-            />
+            <motion.div layoutId="hovered" className="absolute inset-0 h-full w-full rounded-full bg-white/80" />
           )}
           <span className="relative z-20">{item.name}</span>
         </a>
@@ -316,7 +309,7 @@ function NavbarButton({
     primary:
       "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     secondary:
-      "bg-transparent shadow-none dark:text-white border border-white/20 hover:bg-white/20 hover:backdrop-blur-xl",
+      "bg-transparent shadow-none dark:text:white border border-white/20 hover:bg-white/20 hover:backdrop-blur-xl",
     dark:
       "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     gradient:
