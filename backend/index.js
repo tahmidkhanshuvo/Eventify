@@ -9,26 +9,26 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// --- This are for controllers ---
+// --- Routes ---
 const authRoutes = require('./routes/auth');
 const superAdminRoutes = require('./routes/superAdmin');
 const eventRoutes = require('./routes/events');
 const registrationRoutes = require('./routes/registrations');
 const chatbotRoutes = require('./routes/chatbot');
 const certificateRoutes = require('./routes/certificates');
+const userRoutes = require('./routes/users'); // NEW
 
 app.get('/', (req, res) => {
   res.send('Eventify API is running!');
 });
 
-// --- This are for routing ---
 app.use('/api/auth', authRoutes);
 app.use('/api/superadmin', superAdminRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);
-// -----------------------------------------
+app.use('/api/users', userRoutes); // NEW
 
 let server;
 
