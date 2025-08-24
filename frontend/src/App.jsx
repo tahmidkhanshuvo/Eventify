@@ -8,8 +8,10 @@ import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
 import Events from "./navbar/Events.jsx";
-import Student from "./dahsboard/Student.jsx";
+import Student from "./dashboard/Student.jsx";
 import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
+import Organizer from "./dashboard/Organizer.jsx";  
+
 
  // your background component
 
@@ -20,7 +22,7 @@ export default function App() {
       <BackgroundFX />
 
       {/* Foreground: routes */}
-      <div className="relative z-10">
+      <div className="relative">
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -31,6 +33,8 @@ export default function App() {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/student" element={<Student />} />
             <Route path="/admin" element={<MainAdmin />} />
+            <Route path="/students" element ={<Student/>}/>
+            <Route path ="/organizers" element={<Organizer/>}/>
           </Routes>
         </BrowserRouter>
       </div>

@@ -1,10 +1,10 @@
 // src/SuperAdmin/MainAdmin.jsx
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { HoverEffect } from "../components/ui/card-hover-effect";
-import Switch from "@mui/joy/Switch";
-import Typography from "@mui/joy/Typography";
-import ExpandableProfiles from "../cards/ExpendableProfiles";
 import BackgroundFX from "../components/BackgroundFX";
+import Storedthelist from "./Storedthelist";
+import ApprovalList from "./ApprovalList"; // wrapper that renders ExpandableProfiles
+
 // Demo stats (unchanged)
 export const projects = [
   { id: 1, name: "Working", description: "Events That Running", count: 10 },
@@ -12,7 +12,63 @@ export const projects = [
   { id: 3, name: "Done", description: "Events are Fully Finished", count: 8 },
 ];
 
-// Dummy directory with roles + universities
+// ✅ Dummy candidates to approve (passed into ApprovalList)
+const approvalCandidates = [
+  {
+    id: 101,
+    profile: {
+      name: "Aisha Rahman",
+      username: "aisha_r",
+      email: "aisha@example.com",
+      role: "Student",
+      joined: "2024-03-11",
+      university: "North South University",
+      bio: "CS undergrad passionate about hackathons & ML.",
+      avatar:
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=600",
+    },
+    participatedEvents: [
+      { id: "e1", title: "AI Bootcamp", date: "2024-06-01", status: "Completed" },
+      { id: "e2", title: "HackFest 2024", date: "2024-07-12", status: "Completed" },
+    ],
+  },
+  {
+    id: 102,
+    profile: {
+      name: "Rifat Hasan",
+      username: "rifat_h",
+      email: "rifat@example.com",
+      role: "Organizer",
+      joined: "2023-11-28",
+      university: "BRAC University",
+      bio: "Organizes meetups & workshops for web devs.",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?fm=jpg&q=60&w=600",
+    },
+    participatedEvents: [
+      { id: "e3", title: "React Summit", date: "2024-04-20", status: "Organizer" },
+      { id: "e4", title: "DevOps Day", date: "2024-08-16", status: "Speaker" },
+    ],
+  },
+  {
+    id: 103,
+    profile: {
+      name: "Nusrat Jahan",
+      username: "nusratj",
+      email: "nusrat@example.com",
+      role: "Student",
+      joined: "2024-01-02",
+      university: "Dhaka University",
+      bio: "Frontend learner, loves design systems.",
+      avatar:
+        "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?fm=jpg&q=60&w=600",
+    },
+    participatedEvents: [
+      { id: "e5", title: "Design Systems 101", date: "2024-05-08", status: "Completed" },
+      { id: "e6", title: "UI Marathon", date: "2024-09-21", status: "Registered" },
+    ],
+  },
+];
 const DIRECTORY = [
   {
     id: 1,
@@ -65,126 +121,110 @@ const DIRECTORY = [
   },
 ];
 
-const MainAdmin = () => {
-  // text inputs
-  const [searchUserName, setSearchUserName] = useState("");
-  const [searchEmail, setSearchEmail] = useState("");
-  const [searchUniversity, setSearchUniversity] = useState("");
 
-  // role toggle: ON => Students, OFF => Organizers
-  const [showStudents, setShowStudents] = useState(true);
+export default function MainAdmin() {
+  // search inputs for Approval List
+  const [searchUserName, setSearchUserName] = React.useState("");
+  const [searchEmail, setSearchEmail] = React.useState("");
+  const [searchUniversity, setSearchUniversity] = React.useState("");
 
-  // === filtering logic ===
-  const filtered = useMemo(() => {
-    const uname = searchUserName.trim().toLowerCase();
-    const email = searchEmail.trim().toLowerCase();
-    const univ = searchUniversity.trim().toLowerCase();
+  // tabs
+  const [tab, setTab] = React.useState("approval"); // default
 
-    return DIRECTORY.filter((item) => {
-      const p = item.profile;
+  // filter only for the Approval List
+  const filteredApproval = React.useMemo(() => {
+    const nameQuery = searchUserName.trim().toLowerCase();
+    const emailQuery = searchEmail.trim().toLowerCase();
+    const uniQuery = searchUniversity.trim().toLowerCase();
 
-      // role filter
-      const roleOk = showStudents ? p.role === "Student" : p.role === "Organizer";
-
-      // OR logic across username/email/university (blank inputs are ignored)
-      const matchesUser =
-        !uname || p.username.toLowerCase().includes(uname) || p.name.toLowerCase().includes(uname);
-      const matchesEmail = !email || p.email.toLowerCase().includes(email);
-      const matchesUniv = !univ || (p.university || "").toLowerCase().includes(univ);
-
-      // overall: role must match AND any of the text filters must match
-      // If all three inputs are blank, the OR block becomes true by default because each matcher returns true when its input is blank.
-      const textOk = matchesUser || matchesEmail || matchesUniv;
-
-      return roleOk && textOk;
+    return approvalCandidates.filter((item) => {
+      const p = item.profile || {};
+      const byName =
+        !nameQuery ||
+        (p.name && p.name.toLowerCase().includes(nameQuery)) ||
+        (p.username && p.username.toLowerCase().includes(nameQuery));
+      const byEmail = !emailQuery || (p.email && p.email.toLowerCase().includes(emailQuery));
+      const byUni = !uniQuery || (p.university && p.university.toLowerCase().includes(uniQuery));
+      return byName && byEmail && byUni;
     });
-  }, [showStudents, searchUserName, searchEmail, searchUniversity]);
+  }, [searchUserName, searchEmail, searchUniversity]);
 
   return (
-    <div >
-      <BackgroundFX/>
-    <div className="max-w-7xl mx-auto p-4">
-      <HoverEffect items={projects} />
+    <div className="relative isolate min-h-screen">
+      <BackgroundFX />
 
-      <hr className="h-px bg-gray-200 border-0 dark:bg-gray-300 my-10" />
+      <div className="mx-auto px-10 relative z-10 max-h-[100dvh] max-w-full overflow-auto ">
+        <HoverEffect items={projects} />
 
-      {/* Controls */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Switch + labels */}
-        <div className="flex items-center gap-3">
-          <Switch
-            slotProps={{ input: { "aria-label": "filter by role" } }}
-            sx={{
-              // track always grey
-              "--Switch-trackBackground": "var(--color-gray-300)",
-              "--Switch-trackColor": "#fff",
-              "--Switch-trackBorderWidth": "2px",
-              "--Switch-trackBorderColor": "var(--color-gray-400)",
-              // thumb color shows active role
-              "--Switch-thumbBackground": showStudents ? "var(--color-accent)" : "var(--color-primary)",
-              "--Switch-thumbSize": "16px",
-              borderRadius: "9999px",
-            }}
-            checked={showStudents}
-            onChange={(e) => setShowStudents(e.target.checked)}
-            startDecorator={
-              <Typography
-                level="body-sm"
-                sx={{
-                  fontWeight: "bold",
-                  color: showStudents ? "var(--color-accent)" : "var(--joy-palette-text-tertiary)",
-                }}
-              >
-                Organizer
-              </Typography>
-            }
-            endDecorator={
-              <Typography
-                level="body-sm"
-                sx={{
-                  fontWeight: "bold",
-                  color: !showStudents ? "var(--color-primary)" : "var(--joy-palette-text-tertiary)",
-                }}
-              >Student
-                
-              </Typography>
-            }
-          />
+        <hr className="my-10 h-px border-0 bg-gray-200 dark:bg-gray-300" />
+
+        {/* Tab buttons */}
+        <div className="mb-6 flex items-center gap-2">
+          <button
+            onClick={() => setTab("approval")}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition
+              ${
+                tab === "approval"
+                  ? "bg-white text-black shadow"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+          >
+            Approval List
+          </button>
+          <button
+            onClick={() => setTab("stored")}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition
+              ${
+                tab === "stored"
+                  ? "bg-white text-black shadow"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+          >
+            Stored List
+          </button>
         </div>
 
-        {/* Inputs */}
-        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:justify-end">
-          <input
-            type="text"
-            placeholder="Username or Name…"
-            className="w-full sm:w-64 px-3 py-1.5 rounded-md bg-white placeholder-black text-black text-sm"
-            value={searchUserName}
-            onChange={(e) => setSearchUserName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Email…"
-            className="w-full sm:w-64 px-3 py-1.5 rounded-md bg-neutral-200 placeholder-gray-600 text-black text-sm"
-            value={searchEmail}
-            onChange={(e) => setSearchEmail(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="University…"
-            className="w-full sm:w-64 px-3 py-1.5 rounded-md bg-neutral-200 placeholder-gray-600 text-black text-sm"
-            value={searchUniversity}
-            onChange={(e) => setSearchUniversity(e.target.value)}
-          />
+        {/* Search controls (apply to Approval List only) */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ">
+          <div className="flex flex-1 flex-col gap-3 sm:flex-row">
+            <input
+              type="text"
+              placeholder="Username or Name…"
+              className="w-full rounded-md bg-white px-3 py-1.5 text-sm text-black placeholder-black sm:w-64"
+              value={searchUserName}
+              onChange={(e) => setSearchUserName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Email…"
+              className="w-full rounded-md bg-neutral-200 px-3 py-1.5 text-sm text-black placeholder-gray-600 sm:w-64"
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="University…"
+              className="w-full rounded-md bg-neutral-200 px-3 py-1.5 text-sm text-black placeholder-gray-600 sm:w-64"
+              value={searchUniversity}
+              onChange={(e) => setSearchUniversity(e.target.value)}
+            />
+          </div>
         </div>
+
+        {/* Panels */}
+        {tab === "approval" ? (
+          <ApprovalList profiles={filteredApproval} />
+        ) : (
+          <Storedthelist 
+            profiles={DIRECTORY}
+  searchUserName={searchUserName}
+  onSearchUserNameChange={setSearchUserName}
+  searchEmail={searchEmail}
+  onSearchEmailChange={setSearchEmail}
+  searchUniversity={searchUniversity}
+  onSearchUniversityChange={setSearchUniversity}/>
+        )}
       </div>
-
-      {/* Results */}
-      <section className="mt-6">
-        <ExpandableProfiles profiles={filtered} />
-      </section>
-    </div>
     </div>
   );
-};
-
-export default MainAdmin;
+}
