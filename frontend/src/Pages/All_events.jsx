@@ -1,71 +1,41 @@
+"use client";
 
-// src/pages/MyEvents.jsx
 import React from "react";
-import { motion } from "motion/react" // or: import { motion } from "motion/react";
+import { motion } from "motion/react"; // or: import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-const SAMPLE_EVENTS = [
-  {
-    id: "e-101",
-    name: "HackFest 2025",
-    university: "North South University",
-    club: "NSU ACM",
-    date: "2025-10-12",
-    status: "Registered",
-    cover:
-      "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-102",
-    name: "AI Bootcamp",
-    university: "BRAC University",
-    club: "AI Society",
-    date: "2025-06-28",
-    status: "Completed",
-    cover:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-103",
-    name: "Frontend Fiesta",
-    university: "Dhaka University",
-    club: "DU Dev Circle",
-    date: "2025-09-05",
-    status: "Ongoing",
-    cover:
-      "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-104",
-    name: "DevOps Day",
-    university: "IUT",
-    club: "IUT Programming Club",
-    date: "2025-08-30",
-    status: "Registered",
-    cover:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-105",
-    name: "UI Marathon",
-    university: "BRAC University",
-    club: "Design Guild",
-    date: "2025-11-21",
-    status: "Planned",
-    cover:
-      "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=1600&auto=format&fit=crop",
-  },
-];
-
-export default function All_events({ initialEvents, className }) {
-  // choose data: prop or fallback
-  const events = React.useMemo(
-    () => (Array.isArray(initialEvents) && initialEvents.length ? initialEvents : SAMPLE_EVENTS),
-    [initialEvents]
-  );
-
+export default function MyEvents({ className }) {
+  const [events, setEvents] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const [query, setQuery] = React.useState("");
+  const [error, setError] = React.useState("");
 
+  // Fetch events when the component mounts
+  React.useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch("/api/events", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch events.");
+        }
+
+        const data = await response.json();
+        setEvents(data);
+      } catch (error) {
+        setError("Error fetching events: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Filter events based on search query
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return events;
@@ -77,13 +47,6 @@ export default function All_events({ initialEvents, className }) {
       );
     });
   }, [query, events]);
-
-  // Debug logs
-  React.useEffect(() => {
-    console.log("Events data:", events);
-    console.log("Filtered events:", filtered);
-    console.log("Motion import:", motion);
-  }, [events, filtered]);
 
   return (
     <div className="min-h-dvh bg-transparent">
@@ -97,7 +60,7 @@ export default function All_events({ initialEvents, className }) {
         {/* Header */}
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white">My Events</h1>
+            <h1 className="text-2xl font-semibold text-white">All Events</h1>
             <p className="text-sm text-white/60">Search by event, university, or club.</p>
           </div>
 
@@ -138,12 +101,20 @@ export default function All_events({ initialEvents, className }) {
           </div>
         </div>
 
-        {/* Grid */}
-        {filtered.length ? (
+        {/* Events Section */}
+        {loading ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/70">
+            Loading events...
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/70">
+            {error}
+          </div>
+        ) : filtered.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((ev) => (
               <motion.article
-                key={ev.id}
+                key={ev._id}
                 whileHover={{ y: -3 }}
                 transition={{ type: "spring", stiffness: 250, damping: 22 }}
                 className={cn(
@@ -154,7 +125,7 @@ export default function All_events({ initialEvents, className }) {
                 {/* Cover */}
                 <div className="relative">
                   <img
-                    src={ev.cover}
+                    src={ev.imageUrl}
                     alt={ev.name}
                     className="h-40 w-full object-cover bg-neutral-900"
                     loading="lazy"
