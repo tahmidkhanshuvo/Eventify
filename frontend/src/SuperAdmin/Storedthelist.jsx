@@ -1,18 +1,12 @@
 import React from "react";
-
-import ExpandableProfiles from "../cards/ExpendableProfiles";
+import ExpandableProfiles from "../cards/ExpandableProfiles";
 
 export default function Storedthelist({
   profiles = [],
-
-
-
   searchUserName,
   onSearchUserNameChange,
-
   searchEmail,
   onSearchEmailChange,
-
   searchUniversity,
   onSearchUniversityChange,
 }) {
@@ -33,15 +27,12 @@ export default function Storedthelist({
 
       const uniOk = !uniQuery || (p.university && p.university.toLowerCase().includes(uniQuery));
 
-      return  nameOk && emailOk && uniOk;
+      return nameOk && emailOk && uniOk;
     });
-  }, [profiles,  searchUserName, searchEmail, searchUniversity]);
+  }, [profiles, searchUserName, searchEmail, searchUniversity]);
 
   return (
     <div className="space-y-6">
-    
-
-      {/* Results */}
       <section className="mt-2">
         {filtered.length ? (
           <ExpandableProfiles profiles={filtered} />
@@ -52,5 +43,3 @@ export default function Storedthelist({
     </div>
   );
 }
-
-

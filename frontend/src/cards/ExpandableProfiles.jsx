@@ -2,12 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash } from "lucide-react";
 
-export default function ExpandableProfilesApproval({
-  profiles: initialProfiles = [],
-  onApprove,
-  onReject,
-  busyId,
-}) {
+export default function ExpandableProfiles({ profiles: initialProfiles = [] }) {
   const [profiles, setProfiles] = React.useState(initialProfiles);
   const [selected, setSelected] = React.useState(null);
 
@@ -15,13 +10,13 @@ export default function ExpandableProfilesApproval({
     setProfiles(initialProfiles);
   }, [initialProfiles]);
 
-  const fallbackAvatar =
-    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=600";
-
-  const dropRow = (id) => {
+  const handleDelete = (id) => {
     setProfiles((prev) => prev.filter((p) => (p._id || p.id) !== id));
     setSelected((cur) => ((cur?._id || cur?.id) === id ? null : cur));
   };
+
+  const fallbackAvatar =
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=600";
 
   return (
     <div className="p-0">
@@ -54,32 +49,16 @@ export default function ExpandableProfilesApproval({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={busyId === id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onApprove?.(id);
-                  }}
-                  className="shrink-0 rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-600 active:scale-95 disabled:opacity-60"
-                  title="Approve"
-                >
-                  {busyId === id ? "Approving…" : "Approve"}
-                </button>
-
-                <button
-                  disabled={busyId === id}
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    await onReject?.(id);
-                    dropRow(id);
-                  }}
-                  className="shrink-0 rounded-full bg-red-600 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 active:scale-95 disabled:opacity-60"
-                  title="Reject"
-                >
-                  {busyId === id ? "Working…" : "Reject"}
-                </button>
-              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(id);
+                }}
+                className="shrink-0 rounded-full bg-red-600 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 active:scale-95"
+                title="Delete card"
+              >
+                Delete
+              </button>
             </motion.div>
           );
         })}
@@ -125,9 +104,21 @@ export default function ExpandableProfilesApproval({
                           @{prof.username} • {prof.email}
                         </p>
                         <div className="mt-2 space-y-1 text-sm text-neutral-700">
-                          {prof.role && <div>Role: <span className="font-medium">{prof.role}</span></div>}
-                          {prof.joined && <div>Joined: <span className="font-medium">{prof.joined}</span></div>}
-                          {prof.university && <div>University: <span className="font-medium">{prof.university}</span></div>}
+                          {prof.role && (
+                            <div>
+                              Role: <span className="font-medium">{prof.role}</span>
+                            </div>
+                          )}
+                          {prof.joined && (
+                            <div>
+                              Joined: <span className="font-medium">{prof.joined}</span>
+                            </div>
+                          )}
+                          {prof.university && (
+                            <div>
+                              University: <span className="font-medium">{prof.university}</span>
+                            </div>
+                          )}
                           {prof.bio && <p className="mt-3">{prof.bio}</p>}
                         </div>
                       </div>
@@ -135,22 +126,9 @@ export default function ExpandableProfilesApproval({
 
                     <div className="flex items-center gap-2">
                       <button
-                        disabled={busyId === id}
-                        onClick={() => onApprove?.(id)}
-                        className="rounded-full bg-emerald-500 px-3 py-2 text-white hover:bg-emerald-600 disabled:opacity-60"
-                        title="Approve"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        disabled={busyId === id}
-                        onClick={async () => {
-                          await onReject?.(id);
-                          setSelected(null);
-                          dropRow(id);
-                        }}
-                        className="rounded-full bg-red-600 p-2 text-white hover:bg-red-700 disabled:opacity-60"
-                        title="Reject"
+                        onClick={() => handleDelete(id)}
+                        className="rounded-full bg-red-600 p-2 text-white hover:bg-red-700"
+                        title="Delete card"
                       >
                         <Trash className="h-5 w-5" />
                       </button>

@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 import BackgroundFX from "./components/BackgroundFX.jsx";
-import Layout from "./components/Layout.jsx"; // ⬅️ import Layout
+import Layout from "./components/Layout.jsx";
 
 import LoginPage from "./login/login.jsx";
 import SignUpPage from "./signup/signup.jsx";
@@ -18,14 +18,18 @@ import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
 import Events from "./navbar/Events.jsx";
 import Student from "./dashboard/Student.jsx";
-import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
-import Organizer from "./dashboard/Organizer.jsx";  
+
+// ⬇️ use your actual files in /SuperAdmin
+import SuperAdmin from "./SuperAdmin/SuperAdmin.jsx";
+import SuperAdminLogin from "./SuperAdmin/SuperAdminLogin.jsx";
+
 
 
 function AppInner() {
   const location = useLocation();
   const path = location.pathname;
-  const hideGlobalBg = path === "/login" || path === "/signup";
+  const hideGlobalBg =
+    path === "/login" || path === "/signup" || path === "/admin-login";
 
   // Authoritative auth check from server (cookie-based)
   const [me, setMe] = useState({ loading: true, user: null });
@@ -72,19 +76,27 @@ function AppInner() {
     return children;
   }
 
+  // Allow accessing the admin-login page even if a non-admin is logged in.
+  // If a Super Admin is already logged in, send them straight to /admin.
+  function AdminPortalGate({ children }) {
+    if (me.loading) return <PageLoader />;
+    if (me.user?.role === "Super Admin") return <Navigate to="/admin" replace />;
+    return children;
+  }
+
   return (
     <div>
       {!hideGlobalBg && <BackgroundFX />}
-    
+
       <div className="relative z-10">
         <Routes>
-          {/* Public menu pages wrapped with Layout so they show Navbar + Footer */}
+          {/* Public pages show Navbar + Footer via Layout */}
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/aboutus" element={<Layout><AboutUs /></Layout>} />
           <Route path="/clubs" element={<Layout><Club /></Layout>} />
           <Route path="/events" element={<Layout><Events /></Layout>} />
 
-          {/* Auth pages: these already include their own <Layout> */}
+          {/* Auth pages (these already include their own Layouts if any) */}
           <Route
             path="/login"
             element={
@@ -102,7 +114,17 @@ function AppInner() {
             }
           />
 
-          {/* Protected routes (don’t wrap unless those pages expect Layout) */}
+          {/* Super Admin login (separate portal) */}
+          <Route
+            path="/admin-login"
+            element={
+              <AdminPortalGate>
+                <SuperAdminLogin />
+              </AdminPortalGate>
+            }
+          />
+
+          {/* Protected routes */}
           <Route
             path="/student"
             element={
@@ -115,7 +137,7 @@ function AppInner() {
             path="/admin"
             element={
               <ProtectedRoute roles={["Super Admin"]}>
-                <MainAdmin />
+                <SuperAdmin />
               </ProtectedRoute>
             }
           />
