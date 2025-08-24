@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // ⬅️ add
+import { useNavigate, useLocation } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -12,8 +12,8 @@ export default function SidebarDemo({
   children, // we will render <Outlet /> from the parent here
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const navigate = useNavigate();           // ⬅️
-  const { pathname } = useLocation();       // ⬅️
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const fallbackLinks = [
     { label: "My Events", href: "/student/myevents", icon: <span className="h-5 w-5 shrink-0 rounded bg-white" /> },
@@ -26,8 +26,8 @@ export default function SidebarDemo({
   return (
     <div
       className={cn(
-        "fixed inset-0 flex h-dvh w-screen overflow-hidden md:flex-row",
-        "bg-transparent",
+        "fixed inset-0 flex h-dvh w-screen overflow-hidden md:flex-row", 
+        "bg-transparent", 
         className
       )}
     >
@@ -43,7 +43,7 @@ export default function SidebarDemo({
                     link={link}
                     onClick={(e) => {
                       e.preventDefault();
-                      navigate(link.href);    // ⬅️ route change, URL updates
+                      navigate(link.href); // route change
                     }}
                     className="rounded-md px-2 bg-transparent hover:bg-transparent focus:bg-transparent"
                     labelClassName={cn("!text-white", active && "font-semibold")}

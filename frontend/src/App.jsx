@@ -1,36 +1,34 @@
-// App.jsx
+// src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
 import BackgroundFX from "./components/BackgroundFX.jsx";
-import LoginPage from "./login/login.jsx";
-import SignUpPage from "./signup/signup.jsx";
+
 import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
 import Events from "./navbar/Events.jsx";
+import LoginPage from "./login/login.jsx";
+import SignUpPage from "./signup/signup.jsx";
+
 import Student from "./dashboard/Student.jsx";
-import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
 import Organizer from "./dashboard/Organizer.jsx";
-import CreateEvent from "./Pages/Create_events.jsx";
-// ✅ make sure this path/casing matches your file exactly
-// If your file is ./Pages/My_events.jsx keep your original import
+import MainAdmin from "./SuperAdmin/mainAdmin.jsx";
+
+// pages used by both
 import MyEvents from "./Pages/My_events.jsx";
-import All_events from "./Pages/All_events.jsx";
-import Create_events from "./Pages/Create_events.jsx";
-import Profilepage from "./Pages/Profilepage.jsx";
+import AllEvents from "./Pages/All_events.jsx";
+import CreateEvent from "./Pages/Create_events.jsx";       // ✅ ensure filename
+import ProfileStudent from "./Pages/Profilepage.jsx";
+import ProfileOrganizers from "./Pages/ProfileOrganizers.jsx";
 
 export default function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      {/* Background stays behind everything */}
       <BackgroundFX />
-
-      {/* Foreground: routes */}
       <div className="relative z-10 min-h-screen">
         <BrowserRouter>
           <Routes>
-            {/* Public/top-level */}
+            {/* public */}
             <Route path="/" element={<Home />} />
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/clubs" element={<Club />} />
@@ -38,21 +36,23 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/admin" element={<MainAdmin />} />
-  <Route path="/organizers" element={<Organizer />}>
-    <Route index element={<Navigate to="create-event" replace />} />
-    <Route path="myevents" element={<MyEvents />} />
-    <Route path="allevents" element={<All_events />} />
-    <Route path="create-event" element={<CreateEvent />} />
-    {/* <Route path="myprofile" element={<Profile />} /> */}
-  </Route>
-            {/* Nested student area */}
+
+            {/* student area */}
             <Route path="/student" element={<Student />}>
-              {/* default -> /students/myevents */}
               <Route index element={<Navigate to="myevents" replace />} />
               <Route path="myevents" element={<MyEvents />} />
-              <Route path="allevents" element={<All_events />} />
-              <Route path="myprofile" element={<Profilepage />} />
-              <Route path="me" element={<Profilepage />} />
+              <Route path="allevents" element={<AllEvents />} />
+              <Route path="myprofile" element={<ProfileStudent />} />
+              <Route path="me" element={<ProfileStudent />} />
+            </Route>
+
+            {/* organizers area */}
+            <Route path="/organizers" element={<Organizer />}>
+              <Route index element={<Navigate to="create-event" replace />} />
+              <Route path="myevents" element={<MyEvents />} />
+              <Route path="allevents" element={<AllEvents />} />
+              <Route path="create-event" element={<CreateEvent />} />
+              <Route path="profileorganizers" element={<ProfileOrganizers />} />
             </Route>
           </Routes>
         </BrowserRouter>
