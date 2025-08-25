@@ -13,17 +13,16 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 
-// --- CORS setup ---
+// --- CORS setup from .env ---
 const allowedOrigins = [
-  "http://localhost:5173",                // local frontend
-  "https://eventify-3-14av.onrender.com" // deployed frontend
-];
+  process.env.APP_URL_LOCAL,
+  process.env.APP_URL,
+].filter(Boolean); // remove undefined values
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps, curl, Postman)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow Postman, curl, etc.
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
@@ -46,7 +45,6 @@ app.get('/', (req, res) => {
   res.send('Eventify API is running!');
 });
 
-// Mount under /api/*
 app.use('/api/auth', authRoutes);
 app.use('/api/superadmin', superadminRoutes);
 app.use('/api/events', require('./routes/eventRoutes'));
