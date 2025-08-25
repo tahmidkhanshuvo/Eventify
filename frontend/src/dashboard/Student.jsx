@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import SidebarDemo from "../components/SidebarDemo.jsx";
+import SidebarDemo from "../components/sidebardemo.jsx";
 import {
   IconArrowLeft,
   IconBrandTabler,
