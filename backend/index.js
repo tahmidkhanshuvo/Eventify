@@ -13,28 +13,34 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 
-// With Vite dev proxy you don't need CORS, but keeping a permissive fallback is fine.
-// If you ever hit the API directly from a different origin, enable credentials:
-/*
-app.use(cors({
-  origin: ['http://localhost:5173'], // your Vite dev server
-  credentials: true,
-}));
-*/
-app.use(cors());
+// --- CORS setup ---
+const allowedOrigins = [
+  "http://localhost:5173",                // local frontend
+  "https://eventify-3-14av.onrender.com" // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // --- Routes ---
 const authRoutes = require('./routes/auth');
-
 const superadminRoutes = require('./routes/superadminRoutes');
 const registrationRoutes = require('./routes/registrations');
 const chatbotRoutes = require('./routes/chatbot');
 const certificateRoutes = require('./routes/certificates');
 const userRoutes = require('./routes/users');
-
-
-
-//const eventRoutes = ; // NEW
 
 app.get('/', (req, res) => {
   res.send('Eventify API is running!');
@@ -47,21 +53,19 @@ app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);
-app.use('/api/users', userRoutes); 
-
+app.use('/api/users', userRoutes);
 
 let server;
-
 if (process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-      console.log('Successfully connected to MongoDB!');
+      console.log('✅ Successfully connected to MongoDB!');
       server = app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
+        console.log(`🚀 Server is running on port ${PORT}`);
       });
     })
     .catch((error) => {
-      console.error('Connection failed!', error);
+      console.error('❌ Connection failed!', error);
     });
 }
 
