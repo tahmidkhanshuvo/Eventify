@@ -25,13 +25,14 @@ app.use(cors());
 
 // --- Routes ---
 const authRoutes = require('./routes/auth');
+
 const superadminRoutes = require('./routes/superadminRoutes');
-const eventRoutes = require('./routes/events');
 const registrationRoutes = require('./routes/registrations');
 const chatbotRoutes = require('./routes/chatbot');
 const certificateRoutes = require('./routes/certificates');
 const userRoutes = require('./routes/users');
 
+//const eventRoutes = ; // NEW
 
 app.get('/', (req, res) => {
   res.send('Eventify API is running!');
@@ -40,7 +41,7 @@ app.get('/', (req, res) => {
 // Mount under /api/*
 app.use('/api/auth', authRoutes);
 app.use('/api/superadmin', superadminRoutes);
-app.use('/api/events', eventRoutes);
+app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);

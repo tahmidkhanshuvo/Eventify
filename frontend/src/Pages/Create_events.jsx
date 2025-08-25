@@ -1,4 +1,4 @@
-// src/pages/CreateEvent.jsx
+// src/Pages/Create_events.jsx
 import React from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
@@ -26,10 +26,13 @@ export default function CreateEvent({ className }) {
     time: "",     // HH:mm (local)
     location: "",
     category: "",
-    imageUrl: "",
-    imageKitFileId: "", // if you later plug ImageKit, fill this after upload
+    imageUrl: "",   // optional: if organizer wants to paste a URL instead of uploading
     capacity: "",
   });
+
+  // local file state + preview
+  const [file, setFile] = React.useState(null);
+  const [filePreview, setFilePreview] = React.useState("");
 
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -41,8 +44,7 @@ export default function CreateEvent({ className }) {
   };
 
   function toDateISO(dateStr, timeStr) {
-    // Combine local date+time -> Date
-    // If no time, default to 09:00
+    // Combine local date+time -> Date (default 09:00 if time empty)
     const t = timeStr?.trim() ? timeStr : "09:00";
     const d = new Date(`${dateStr}T${t}`);
     return d.toISOString();
@@ -57,6 +59,34 @@ export default function CreateEvent({ className }) {
     if (form.capacity && Number(form.capacity) < 0) return "Capacity cannot be negative.";
     return "";
   };
+
+  // handle file select + preview (PNG/JPG/WEBP)
+  const onFileChange = (e) => {
+    const f = e.target.files?.[0];
+    setError("");
+    if (!f) {
+      setFile(null);
+      if (filePreview) URL.revokeObjectURL(filePreview);
+      setFilePreview("");
+      return;
+    }
+    if (!/^image\/(png|jpe?g|webp)$/i.test(f.type)) {
+      setError("Please select a PNG, JPG, or WEBP image.");
+      e.target.value = "";
+      return;
+    }
+    // revoke old preview before replacing
+    if (filePreview) URL.revokeObjectURL(filePreview);
+    setFile(f);
+    setFilePreview(URL.createObjectURL(f));
+  };
+
+  React.useEffect(() => {
+    // cleanup preview URL on unmount
+    return () => {
+      if (filePreview) URL.revokeObjectURL(filePreview);
+    };
+  }, [filePreview]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -75,28 +105,57 @@ export default function CreateEvent({ className }) {
       date: toDateISO(form.date, form.time),   // matches schema `Date`
       location: form.location.trim(),
       category: form.category,
-      imageUrl: form.imageUrl.trim(),
-      imageKitFileId: form.imageKitFileId.trim(),
+      imageUrl: form.imageUrl.trim(),          // optional direct URL path still supported
       capacity: form.capacity ? Number(form.capacity) : undefined,
       // createdBy is set by backend (from auth); do NOT send from the client.
     };
 
     try {
       setSubmitting(true);
+
+      // 1) Create the event (cookie-based auth)
       const res = await fetch("/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Your session has expired. Please log in again.");
+        }
         const msg = await res.text();
         throw new Error(msg || "Failed to create event.");
       }
 
+      const created = await res.json();
+
+      // 2) If a file was chosen, upload banner to /api/events/:id/banner
+      if (file) {
+        const fd = new FormData();
+        // IMPORTANT: field name must match upload.single('banner') on the server
+        fd.append("banner", file);
+
+        const up = await fetch(`/api/events/${created._id}/banner`, {
+          method: "POST",
+          credentials: "include",
+          body: fd,
+        });
+
+        if (!up.ok) {
+          if (up.status === 401) {
+            throw new Error("Your session has expired. Please log in again.");
+          }
+          const umsg = await up.text();
+          // event exists; we only surface banner upload failure
+          throw new Error(umsg || "Event created, but banner upload failed.");
+        }
+      }
+
       setSuccess("Event created successfully!");
-      // optional: go to My Events
-      setTimeout(() => navigate("/students/myevents"), 900);
+      // Navigate organizer to My Events (matches your sidebar link)
+      setTimeout(() => navigate("/organizers/myevents"), 900);
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -219,8 +278,9 @@ export default function CreateEvent({ className }) {
             />
           </div>
 
+          {/* Optional: paste an image URL */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-white/70">Image URL</label>
+            <label className="mb-1 block text-xs font-medium text-white/70">Image URL (optional)</label>
             <input
               name="imageUrl"
               type="url"
@@ -231,33 +291,31 @@ export default function CreateEvent({ className }) {
             />
           </div>
 
-          {/* Image preview */}
-          {form.imageUrl ? (
+          {/* File upload */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/70">
+              Upload Banner (1920×1080 JPG/PNG/WEBP)
+            </label>
+            <input
+              type="file"
+              accept="image/png, image/jpeg, image/jpg, image/webp"
+              onChange={onFileChange}
+              className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-black hover:file:brightness-95"
+            />
+          </div>
+
+          {/* Preview (uploaded file takes priority; else URL) */}
+          {(filePreview || form.imageUrl) ? (
             <div className="md:col-span-2">
               <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
                 <img
-                  src={form.imageUrl}
+                  src={filePreview || form.imageUrl}
                   alt="Event cover preview"
                   className="h-48 w-full object-cover"
                 />
               </div>
             </div>
           ) : null}
-
-          {/* ImageKit file id (optional; fill after you add uploader) */}
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-xs font-medium text-white/70">
-              ImageKit File ID (optional)
-            </label>
-            <input
-              name="imageKitFileId"
-              type="text"
-              value={form.imageKitFileId}
-              onChange={onChange}
-              placeholder="populated by your ImageKit uploader"
-              className="w-full rounded-xl bg-white/5 px-3 py-2 text-sm text-white ring-1 ring-white/10 placeholder-white/40 outline-none focus:ring-2 focus:ring-[#7d9dd2]/40"
-            />
-          </div>
         </div>
 
         {/* Messages */}

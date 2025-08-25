@@ -9,14 +9,12 @@ import {
 } from "react-router-dom";
 
 import BackgroundFX from "./components/BackgroundFX.jsx";
-import Layout from "./components/Layout.jsx";
 
 import LoginPage from "./login/login.jsx";
 import SignUpPage from "./signup/signup.jsx";
 import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
-import Events from "./navbar/Events.jsx";
 
 // Dashboards (layouts that render <Outlet/>)
 import Student from "./dashboard/Student.jsx";
@@ -112,11 +110,11 @@ function AppInner() {
 
       <div className="relative z-10">
         <Routes>
-          {/* Public pages show Navbar + Footer via Layout */}
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/aboutus" element={<Layout><AboutUs /></Layout>} />
-          <Route path="/clubs" element={<Layout><Club /></Layout>} />
-          <Route path="/events" element={<Layout><Events /></Layout>} />
+          
+          <Route path="/" element={<Home />} />
+          <Route path="/aboutus" element={<AboutUs />} />
+          <Route path="/clubs" element={<Club />} />
+          <Route path="/events" element={<AllEvents />} />
 
           {/* Auth pages */}
           <Route
