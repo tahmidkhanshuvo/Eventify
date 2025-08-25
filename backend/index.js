@@ -32,6 +32,8 @@ const chatbotRoutes = require('./routes/chatbot');
 const certificateRoutes = require('./routes/certificates');
 const userRoutes = require('./routes/users');
 
+
+
 //const eventRoutes = ; // NEW
 
 app.get('/', (req, res) => {
@@ -45,7 +47,8 @@ app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);
-app.use('/api/users', userRoutes); // NEW
+app.use('/api/users', userRoutes); 
+
 
 let server;
 

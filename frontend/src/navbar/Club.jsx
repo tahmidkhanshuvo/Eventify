@@ -58,9 +58,9 @@ export default function Club() {
 
         <section className="relative z-10 mx-auto w-[min(1200px,92%)] pt-12 sm:pt-16 md:pt-20 pb-20 sm:pb-24 md:pb-28">
           {/* Title */}
-         <br> <h2 className="text-4xl font-bold text-white text-center bg-gradient-to-r from-indigo-500 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent mb-8">
+          <h2 className="mt-8 mb-8 text-4xl font-bold text-center bg-gradient-to-r from-indigo-500 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
             Explore University Clubs
-          </h2> </br>
+          </h2>
 
           {/* Search Filter Bar */}
           <div className="flex justify-center mb-8">

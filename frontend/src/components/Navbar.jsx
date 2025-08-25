@@ -20,7 +20,7 @@ export default function Navbar({ user, onLogout = () => {} }) {
   const navItems = [
     { name: "Home", link: "/" },
     { name: "Events", link: "/events" },
-    { name: "Clubs", link: "/clubs" },
+    { name: "Club", link: "/club" },
     { name: "About Us", link: "/aboutus" },
   ];
 

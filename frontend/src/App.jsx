@@ -8,6 +8,8 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import "./api.js";
+
 import BackgroundFX from "./components/BackgroundFX.jsx";
 
 import LoginPage from "./login/login.jsx";
@@ -15,6 +17,7 @@ import SignUpPage from "./signup/signup.jsx";
 import Home from "./navbar/Home.jsx";
 import AboutUs from "./navbar/AboutUs.jsx";
 import Club from "./navbar/Club.jsx";
+import EventDetails from "./Pages/EventDetails.jsx";
 
 // Dashboards (layouts that render <Outlet/>)
 import Student from "./dashboard/Student.jsx";
@@ -113,7 +116,7 @@ function AppInner() {
           
           <Route path="/" element={<Home />} />
           <Route path="/aboutus" element={<AboutUs />} />
-          <Route path="/clubs" element={<Club />} />
+          <Route path="/club" element={<Club />} />
           <Route path="/events" element={<AllEvents />} />
 
           {/* Auth pages */}
