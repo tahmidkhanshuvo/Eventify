@@ -19,12 +19,21 @@ const allowedOrigins = [
   process.env.APP_URL         // e.g. https://your-frontend.onrender.com
 ].filter(Boolean);
 
+// Helper: strip trailing slashes for consistency
+function normalizeUrl(url = "") {
+  return url.replace(/\/+$/, ""); 
+}
+
+// Normalize all env origins just once
+const normalizedAllowedOrigins = allowedOrigins.map(normalizeUrl);
+
 // Helper: check if origin matches exactly or is a *.onrender.com URL
 function isAllowedOrigin(origin) {
-  if (allowedOrigins.includes(origin)) return true;
+  const cleanOrigin = normalizeUrl(origin);
+  if (normalizedAllowedOrigins.includes(cleanOrigin)) return true;
 
   // Allow any Render frontend (*.onrender.com)
-  if (origin && /\.onrender\.com$/.test(origin)) {
+  if (cleanOrigin && /\.onrender\.com$/.test(cleanOrigin)) {
     return true;
   }
 
