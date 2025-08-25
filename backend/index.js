@@ -13,19 +13,33 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 
-// --- CORS setup from .env ---
+// --- CORS setup --- //
 const allowedOrigins = [
-  process.env.APP_URL_LOCAL,
-  process.env.APP_URL,
-].filter(Boolean); // remove undefined values
+  process.env.APP_URL_LOCAL,  // e.g. http://localhost:5173
+  process.env.APP_URL         // e.g. https://your-frontend.onrender.com
+].filter(Boolean);
+
+// Helper: check if origin matches exactly or is a *.onrender.com URL
+function isAllowedOrigin(origin) {
+  if (allowedOrigins.includes(origin)) return true;
+
+  // Allow any Render frontend (*.onrender.com)
+  if (origin && /\.onrender\.com$/.test(origin)) {
+    return true;
+  }
+
+  return false;
+}
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow Postman, curl, etc.
-      if (allowedOrigins.includes(origin)) {
+      console.log("🛰 Incoming request from:", origin);
+      if (!origin) return callback(null, true); // allow Postman, curl
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       } else {
+        console.log("❌ Blocked by CORS:", origin);
         return callback(new Error("Not allowed by CORS"));
       }
     },
@@ -33,7 +47,7 @@ app.use(
   })
 );
 
-// --- Routes ---
+// --- Routes --- //
 const authRoutes = require('./routes/auth');
 const superadminRoutes = require('./routes/superadminRoutes');
 const registrationRoutes = require('./routes/registrations');
@@ -53,6 +67,7 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/users', userRoutes);
 
+// --- Mongo & Server --- //
 let server;
 if (process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.MONGO_URI)
