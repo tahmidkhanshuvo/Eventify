@@ -6,7 +6,7 @@
 
 A university event platform for discovery, organizer approval, registrations and participation certificates.
 
-[Live demo](https://eventify-3-14av.onrender.com) · [Source](https://github.com/tahmidkhanshuvo/Eventify) · [Report a problem](https://github.com/tahmidkhanshuvo/Eventify/issues)
+[Live demo](https://eventify.tahmidkhan.com.bd) · [Source](https://github.com/tahmidkhanshuvo/Eventify) · [Report a problem](https://github.com/tahmidkhanshuvo/Eventify/issues)
 
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react) ![Express](https://img.shields.io/badge/Express-5-ffffff?logo=express) ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47a248?logo=mongodb)
 
@@ -114,6 +114,7 @@ The suite covers account approval/sign-in, event creation, student enrollment, c
 
 ## Deployment
 
-Use the existing free Render Node API with root `backend`, build `npm ci`, start `npm start`, and readiness path `/healthz`. Configure Atlas, signing secret, ImageKit and allowed origins in Render. The frontend can use the existing Render static site or Vercel with root `frontend`, build `npm run build`, output `dist`, and the API origin in `VITE_API_BASE_URL`. `frontend/vercel.json` preserves client-side routes on refresh.
+Use the existing free Render Node API with root `backend`, build `npm ci`, start `npm start`, and readiness path `/healthz`. Configure Atlas, signing secret, ImageKit and allowed origins in Render. The frontend can use the existing Render static site or Vercel with root `frontend`, build `npm run build`, output `dist`, and the API origin in `VITE_API_BASE_URL`. `frontend/vercel.json` forwards same-origin API requests to the existing Render service and preserves client-side routes on refresh. Leave the frontend API variable empty to use that proxy, or set the direct API origin explicitly.
 
 Verify a public calendar request, sign-in, a registration/cancellation, and an organizer management screen after deployment. Use a disposable event/account for write checks. Keep original application data intact, retain a previous successful deployment for rollback, and review environment settings before changing a domain.
+

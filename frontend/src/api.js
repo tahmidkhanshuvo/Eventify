@@ -7,7 +7,8 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(
 const originalFetch = window.fetch;
 
 window.fetch = async (input, init) => {
-  if (typeof input === "string" && input.startsWith("/api")) {
+  const isApiRequest = typeof input === "string" && /^\/api(?:\/|$)/.test(input);
+  if (isApiRequest) {
     // input already starts with /api → no need to add extra slash
     input = API_BASE_URL + input;
     const headers = new Headers(init?.headers);
@@ -21,5 +22,8 @@ window.fetch = async (input, init) => {
       signal: init?.signal || AbortSignal.timeout(90000),
     };
   }
-  return originalFetch(input, init);
+  const response = await originalFetch(input, init);
+  if (isApiRequest && response.headers.get("content-type")?.includes("text/html"))
+    throw new Error("The event service is unavailable. Please try again shortly.");
+  return response;
 };
