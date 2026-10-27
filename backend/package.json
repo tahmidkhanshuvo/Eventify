@@ -13,6 +13,7 @@
   "description": "",
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^11.3.0",
     "sharp": "^0.34.3",
     "supertest": "^7.0.0"
   },
@@ -30,4 +31,3 @@
     "pdfkit": "^0.17.1"
   }
 }
-

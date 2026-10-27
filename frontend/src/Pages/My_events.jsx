@@ -1,216 +1,174 @@
-
-// src/pages/MyEvents.jsx
 import React from "react";
-import { motion } from "motion/react" // or: import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import { CalendarDays } from "lucide-react";
+import { downloadCertificate } from "./EventDetails";
 
-const SAMPLE_EVENTS = [
-  {
-    id: "e-101",
-    name: "HackFest 2025",
-    university: "North South University",
-    club: "NSU ACM",
-    date: "2025-10-12",
-    status: "Registered",
-    cover:
-      "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-102",
-    name: "AI Bootcamp",
-    university: "BRAC University",
-    club: "AI Society",
-    date: "2025-06-28",
-    status: "Completed",
-    cover:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-103",
-    name: "Frontend Fiesta",
-    university: "Dhaka University",
-    club: "DU Dev Circle",
-    date: "2025-09-05",
-    status: "Ongoing",
-    cover:
-      "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-104",
-    name: "DevOps Day",
-    university: "IUT",
-    club: "IUT Programming Club",
-    date: "2025-08-30",
-    status: "Registered",
-    cover:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop",
-  },
-  {
-    id: "e-105",
-    name: "UI Marathon",
-    university: "BRAC University",
-    club: "Design Guild",
-    date: "2025-11-21",
-    status: "Planned",
-    cover:
-      "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=1600&auto=format&fit=crop",
-  },
-];
-
-export default function MyEvents({ initialEvents, className }) {
-  // choose data: prop or fallback
-  const events = React.useMemo(
-    () => (Array.isArray(initialEvents) && initialEvents.length ? initialEvents : SAMPLE_EVENTS),
-    [initialEvents]
-  );
-
+export default function MyEvents({ mode = "created" }) {
+  const [events, setEvents] = React.useState([]);
   const [query, setQuery] = React.useState("");
-
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return events;
-    return events.filter((e) => {
-      return (
-        e.name.toLowerCase().includes(q) ||
-        (e.university || "").toLowerCase().includes(q) ||
-        (e.club || "").toLowerCase().includes(q)
-      );
-    });
-  }, [query, events]);
-
-  // Debug logs
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
+  const [attempt, setAttempt] = React.useState(0);
+  const [busy, setBusy] = React.useState("");
   React.useEffect(() => {
-    console.log("Events data:", events);
-    console.log("Filtered events:", filtered);
-    console.log("Motion import:", motion);
-  }, [events, filtered]);
-
-  return (
-    <div className="min-h-dvh bg-transparent">
-      {/* page container */}
-      <div
-        className={cn(
-          "relative z-10 mx-auto w-full max-w-7xl bg-transparent p-4 md:p-8",
-          className
-        )}
-      >
-        {/* Header */}
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-white">My Events</h1>
-            <p className="text-sm text-white/60">Search by event, university, or club.</p>
-          </div>
-
-          {/* Search */}
-          <div className="w-full sm:w-96">
-            <label className="sr-only">Search</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search events, universities, clubs…"
-                className={cn(
-                  "w-full rounded-xl bg-white/5 px-10 py-2.5 text-sm text-white",
-                  "placeholder-white/50 outline-none ring-1 ring-white/10",
-                  "focus:ring-2 focus:ring-[#7d9dd2]/40"
-                )}
-              />
-              <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/60"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="11" cy="11" r="7"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-white/70 hover:bg-white/10"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Grid */}
-        {filtered.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((ev) => (
-              <motion.article
-                key={ev.id}
-                whileHover={{ y: -3 }}
-                transition={{ type: "spring", stiffness: 250, damping: 22 }}
-                className={cn(
-                  "group/isolate isolate overflow-hidden rounded-2xl border border-white/10 bg-white/5",
-                  "hover:bg-white/10 transition-colors"
-                )}
-              >
-                {/* Cover */}
-                <div className="relative">
-                  <img
-                    src={ev.cover}
-                    alt={ev.name}
-                    className="h-40 w-full object-cover bg-neutral-900"
-                    loading="lazy"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                  <div className="absolute left-3 top-3 rounded-full bg-black/50 px-2 py-1 text-xs text-white ring-1 ring-white/10">
-                    {formatDate(ev.date)}
-                  </div>
-                </div>
-
-                {/* Body */}
-                <div className="relative z-[1] flex flex-col gap-2 p-4">
-                  <h3 className="truncate text-base font-semibold text-white">{ev.name}</h3>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
-                    <span className="rounded-full bg-white/5 px-2 py-1 ring-1 ring-white/10">
-                      {ev.university}
-                    </span>
-                    <span className="rounded-full bg-white/5 px-2 py-1 ring-1 ring-white/10">
-                      {ev.club}
-                    </span>
-                    <span className="ml-auto rounded-full bg-[#5fc3b1]/20 px-2 py-1 text-xs text-[#5fc3b1] ring-1 ring-[#5fc3b1]/30">
-                      {ev.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 flex items-center gap-2">
-                    <button className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white ring-1 ring-white/10 hover:bg-white/15">
-                      View
-                    </button>
-                    <button className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white ring-1 ring-white/10 hover:bg-white/15">
-                      Manage
-                    </button>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/70">
-            No events found. Try a different search.
-          </div>
-        )}
-      </div>
-    </div>
+    let active = true;
+    setLoading(true);
+    setError("");
+    fetch(
+      mode === "registered" ? "/api/registrations/my-events" : "/api/events/my",
+    )
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.message || "Unable to load your events.");
+        return data;
+      })
+      .then((data) => {
+        if (active) setEvents(data);
+      })
+      .catch((err) => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [mode, attempt]);
+  const filtered = events.filter((event) =>
+    [event.title, event.location, event.category]
+      .join(" ")
+      .toLowerCase()
+      .includes(query.toLowerCase()),
   );
-}
-
-function formatDate(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
+  const certificate = async (event) => {
+    setBusy(event._id);
+    setError("");
+    try {
+      await downloadCertificate(event);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  };
+  return (
+    <main className="mx-auto w-full max-w-6xl p-3 text-white md:p-6">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="mb-3 text-xs uppercase tracking-[.2em] text-lime-200">
+            Your campus calendar
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight">My events</h1>
+          <p className="mt-3 text-sm text-slate-400">
+            {mode === "registered"
+              ? "Your registrations, memories, and participation certificates."
+              : "Manage your events and keep track of attendees."}
+          </p>
+        </div>
+        <input
+          aria-label="Search your events"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search your events…"
+          className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm"
+        />
+      </div>
+      {error && (
+        <div
+          role="alert"
+          className="mb-6 rounded-xl border border-red-300/20 bg-red-300/5 p-5 text-sm text-red-200"
+        >
+          {error}
+          <button
+            onClick={() => setAttempt((value) => value + 1)}
+            className="ml-4 underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+      {loading ? (
+        <p role="status" className="p-6 text-slate-400">
+          Loading your events…
+        </p>
+      ) : filtered.length ? (
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((event) => (
+            <article
+              key={event._id}
+              className="overflow-hidden rounded-2xl border border-white/10 bg-white/[.035]"
+            >
+              {event.imageUrl ? (
+                <img
+                  loading="lazy"
+                  src={event.imageUrl}
+                  alt=""
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <div className="grid aspect-video place-items-center bg-violet-300/10">
+                  <CalendarDays className="text-violet-200" size={36} />
+                </div>
+              )}
+              <div className="p-5">
+                <p className="text-xs text-lime-200">{event.category}</p>
+                <h2 className="my-3 text-lg font-medium">{event.title}</h2>
+                <p className="text-xs text-slate-400">
+                  {new Date(event.date).toLocaleDateString("en-GB", {
+                    dateStyle: "long",
+                    timeZone: "Asia/Dhaka",
+                  })}{" "}
+                  · {event.location}
+                </p>
+                <div className="mt-6 flex flex-wrap gap-4 text-xs">
+                  <Link
+                    to={
+                      mode === "created"
+                        ? `/organizers/manage-event/${event._id}`
+                        : `/events/${event._id}`
+                    }
+                    className="text-lime-200"
+                  >
+                    {mode === "created"
+                      ? "Manage event ↗"
+                      : "View registration ↗"}
+                  </Link>
+                  {mode === "registered" &&
+                    new Date(event.date) <= new Date() && (
+                      <button
+                        disabled={busy === event._id}
+                        onClick={() => certificate(event)}
+                        className="text-violet-200"
+                      >
+                        {busy === event._id
+                          ? "Preparing…"
+                          : "Download certificate"}
+                      </button>
+                    )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-white/15 p-10 text-center text-slate-400">
+          <p>
+            {query
+              ? "No events match your search."
+              : mode === "registered"
+                ? "Your next experience is waiting. Register for an event to see it here."
+                : "You haven’t created any events yet."}
+          </p>
+          <Link
+            className="mt-5 inline-block text-lime-200"
+            to={mode === "registered" ? "/events" : "/organizers/create-event"}
+          >
+            {mode === "registered" ? "Discover events ↗" : "Create an event ↗"}
+          </Link>
+        </div>
+      )}
+    </main>
+  );
 }

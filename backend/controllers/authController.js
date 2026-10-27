@@ -1,16 +1,18 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET || 'a-very-secret-key-that-should-be-in-env';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error("JWT_SECRET must be configured.");
 
-const generateToken = (id) => jwt.sign({ id }, JWT_SECRET, { expiresIn: '30d' });
+const generateToken = (id) =>
+  jwt.sign({ id }, JWT_SECRET, { expiresIn: "30d" });
 
 const setAuthCookie = (res, token) => {
-  res.cookie('token', token, {
+  res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // keep false in dev
-    sameSite: 'lax',
-    path: '/',
+    secure: process.env.NODE_ENV === "production", // keep false in dev
+    sameSite: "lax",
+    path: "/",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 };
@@ -32,7 +34,9 @@ const registerStudent = async (req, res) => {
   try {
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User with this email already exists' });
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
     }
 
     const user = await User.create({
@@ -40,8 +44,8 @@ const registerStudent = async (req, res) => {
       username,
       email,
       password, // hashed by pre-save
-      role: 'Student',
-      status: 'Approved',
+      role: "Student",
+      status: "Approved",
       phoneNumber,
       address,
       university,
@@ -61,7 +65,7 @@ const registerStudent = async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Server Error: ' + error.message });
+    return res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
 
@@ -84,7 +88,10 @@ const registerOrganizer = async (req, res) => {
     if (userExists) {
       return res
         .status(400)
-        .json({ message: 'An account with this email already exists or is pending approval.' });
+        .json({
+          message:
+            "An account with this email already exists or is pending approval.",
+        });
     }
 
     const user = await User.create({
@@ -92,8 +99,8 @@ const registerOrganizer = async (req, res) => {
       username,
       email,
       password,
-      role: 'Organizer',
-      status: 'Pending',
+      role: "Organizer",
+      status: "Pending",
       phoneNumber,
       address,
       university,
@@ -107,9 +114,13 @@ const registerOrganizer = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: 'Registration successful! Your application is now pending approval.', token });
+      .json({
+        message:
+          "Registration successful! Your application is now pending approval.",
+        token,
+      });
   } catch (error) {
-    return res.status(500).json({ message: 'Server Error: ' + error.message });
+    return res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
 
@@ -118,10 +129,12 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
-    if (user.role === 'Organizer' && user.status !== 'Approved') {
-      return res.status(401).json({ message: 'Your organizer account is still pending approval.' });
+    if (user.role === "Organizer" && user.status !== "Approved") {
+      return res
+        .status(401)
+        .json({ message: "Your organizer account is still pending approval." });
     }
 
     const token = generateToken(user._id);
@@ -135,24 +148,24 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Server Error: ' + error.message });
+    return res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
 
 // Clear auth cookie
 const logoutUser = (req, res) => {
-  res.clearCookie('token', {
+  res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
   });
-  return res.status(200).json({ message: 'Logged out' });
+  return res.status(200).json({ message: "Logged out" });
 };
 
 // NEW: return current authenticated user (middleware attaches req.user)
 const getMe = (req, res) => {
-  if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
+  if (!req.user) return res.status(401).json({ message: "Not authenticated" });
   return res.json(req.user); // password already excluded in middleware
 };
 

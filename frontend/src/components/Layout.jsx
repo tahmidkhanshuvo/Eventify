@@ -91,7 +91,11 @@ const Layout = ({ children }) => {
 
       // If user was on a protected area, send to login.
       const path = window.location.pathname;
-      if (path.startsWith("/student") || path.startsWith("/organizers") || path.startsWith("/admin")) {
+      if (
+        path.startsWith("/student") ||
+        path.startsWith("/organizers") ||
+        path.startsWith("/admin")
+      ) {
         window.location.href = "/login";
       } else {
         // Soft refresh to update any auth-conditional UI
@@ -107,8 +111,9 @@ const Layout = ({ children }) => {
 
       <Box
         sx={{
-          pt: 8,
-          minHeight: "calc(100vh - 200px)",
+          pt: 0,
+          bgcolor: "#0b0d12",
+          minHeight: "calc(100vh - 80px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
