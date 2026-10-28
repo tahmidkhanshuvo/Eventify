@@ -57,7 +57,7 @@ export default function MyEvents({ mode = "created" }) {
     <main className="mx-auto w-full max-w-6xl p-3 text-white md:p-6">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[.2em] text-lime-200">
+          <p className="mb-3 text-xs uppercase tracking-[.2em] text-sky-200">
             Your campus calendar
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">My events</h1>
@@ -113,7 +113,7 @@ export default function MyEvents({ mode = "created" }) {
                 </div>
               )}
               <div className="p-5">
-                <p className="text-xs text-lime-200">{event.category}</p>
+                <p className="text-xs text-sky-200">{event.category}</p>
                 <h2 className="my-3 text-lg font-medium">{event.title}</h2>
                 <p className="text-xs text-slate-400">
                   {new Date(event.date).toLocaleDateString("en-GB", {
@@ -129,7 +129,7 @@ export default function MyEvents({ mode = "created" }) {
                         ? `/organizers/manage-event/${event._id}`
                         : `/events/${event._id}`
                     }
-                    className="text-lime-200"
+                    className="text-sky-200"
                   >
                     {mode === "created"
                       ? "Manage event ↗"
@@ -162,7 +162,7 @@ export default function MyEvents({ mode = "created" }) {
                 : "You haven’t created any events yet."}
           </p>
           <Link
-            className="mt-5 inline-block text-lime-200"
+            className="mt-5 inline-block text-sky-200"
             to={mode === "registered" ? "/events" : "/organizers/create-event"}
           >
             {mode === "registered" ? "Discover events ↗" : "Create an event ↗"}

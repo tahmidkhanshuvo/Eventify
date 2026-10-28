@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, CalendarDays, Github, Mail } from "lucide-react";
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[#0c101a] text-slate-400">
+    <footer className="border-t border-white/10 bg-neutral-950 text-slate-400">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2">
           <Link
             to="/"
             className="inline-flex items-center gap-3 text-2xl font-semibold tracking-tight text-white"
           >
-            <CalendarDays className="text-lime-200" />
+            <CalendarDays className="text-sky-200" />
             Eventify
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7">

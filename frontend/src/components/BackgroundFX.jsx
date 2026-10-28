@@ -42,6 +42,9 @@ export default function BackgroundFX() {
         .animate-float-slow { animation: float-slow 16s ease-in-out infinite; }
         .animate-float-slower { animation: float-slower 26s ease-in-out infinite; }
         .animate-rotate-slower { animation: rotate-slower 40s linear infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-float-slow, .animate-float-slower, .animate-rotate-slower { animation: none; }
+        }
       `}</style>
     </div>
   );

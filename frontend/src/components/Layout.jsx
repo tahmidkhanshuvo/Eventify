@@ -112,7 +112,7 @@ const Layout = ({ children }) => {
       <Box
         sx={{
           pt: 0,
-          bgcolor: "#0b0d12",
+          bgcolor: "#0a0a0a",
           minHeight: "calc(100vh - 80px)",
           display: "flex",
           flexDirection: "column",

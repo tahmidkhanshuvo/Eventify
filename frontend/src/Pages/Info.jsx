@@ -63,7 +63,7 @@ export default function Info({ page = "help" }) {
   return (
     <Layout>
       <main className="mx-auto max-w-3xl px-6 py-16 text-white">
-        <p className="text-xs uppercase tracking-[.2em] text-lime-200">
+        <p className="text-xs uppercase tracking-[.2em] text-sky-200">
           Eventify / {page}
         </p>
         <h1 className="mt-6 text-4xl font-medium leading-tight tracking-tight sm:text-5xl">
@@ -77,7 +77,7 @@ export default function Info({ page = "help" }) {
             </section>
           ))}
         </div>
-        <Link className="mt-12 inline-block text-sm text-lime-200" to="/events">
+        <Link className="mt-12 inline-block text-sm text-sky-200" to="/events">
           Explore upcoming events ↗
         </Link>
       </main>

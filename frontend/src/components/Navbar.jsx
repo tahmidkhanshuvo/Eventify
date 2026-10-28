@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { CalendarDays, Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 export default function Navbar({ user, onLogout = () => {} }) {
   const [open, setOpen] = useState(false),
     { pathname } = useLocation();
@@ -21,7 +21,7 @@ export default function Navbar({ user, onLogout = () => {} }) {
         ? "/admin"
         : "/student";
   const navClass = ({ isActive }) =>
-    `rounded-lg px-3 py-2 text-xs transition-colors ${isActive ? "text-lime-200" : "text-slate-400 hover:text-white"}`;
+    `rounded-lg px-3 py-2 text-xs transition-colors ${isActive ? "text-sky-200" : "text-slate-400 hover:text-white"}`;
   const links = (
     <>
       <NavLink className={navClass} to="/events">
@@ -37,7 +37,7 @@ export default function Navbar({ user, onLogout = () => {} }) {
         <>
           <Link
             to={dashboard}
-            className="inline-flex items-center gap-2 rounded-lg bg-lime-200 px-4 py-3 text-xs font-medium text-[#121820]"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#5d429a] px-4 py-3 text-xs font-medium text-white"
           >
             Dashboard
             <ArrowUpRight size={14} />
@@ -59,7 +59,7 @@ export default function Navbar({ user, onLogout = () => {} }) {
           </Link>
           <Link
             to="/signup"
-            className="rounded-lg bg-lime-200 px-4 py-3 text-xs font-medium text-[#121820]"
+            className="rounded-lg bg-[#5d429a] px-4 py-3 text-xs font-medium text-white"
           >
             Join the community ↗
           </Link>
@@ -68,17 +68,20 @@ export default function Navbar({ user, onLogout = () => {} }) {
     </>
   );
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0c101a]/95 text-white backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/95 text-white backdrop-blur-xl">
       <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-8 px-6">
         <Link
           to="/"
           aria-label="Eventify home"
           className="inline-flex items-center gap-3 text-xl font-semibold tracking-tight"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-lime-200 text-[#121820]">
-            <CalendarDays size={20} />
-          </span>
-          Eventify
+          <img
+            src="https://ik.imagekit.io/qlaegzdb2/Eventify-white.png?updatedAt=1756038031417"
+            alt="Eventify"
+            width="150"
+            height="46"
+            className="h-10 w-auto object-contain"
+          />
         </Link>
         <nav
           aria-label="Main navigation"

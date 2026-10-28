@@ -105,7 +105,7 @@ export default function EventDetails() {
     return (
       <div className="mx-auto max-w-6xl p-10 text-white">
         <p role="alert">{error || "Event not found."}</p>
-        <Link to="/events" className="mt-4 inline-block text-lime-200">
+        <Link to="/events" className="mt-4 inline-block text-sky-200">
           Back to events
         </Link>
       </div>
@@ -141,7 +141,7 @@ export default function EventDetails() {
       </div>
       <div className="grid gap-8 md:grid-cols-[1fr_320px]">
         <div>
-          <p className="mb-4 text-xs uppercase tracking-[.2em] text-lime-200">
+          <p className="mb-4 text-xs uppercase tracking-[.2em] text-sky-200">
             {event.category}
           </p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -165,7 +165,7 @@ export default function EventDetails() {
             {ended ? "Event completed" : "Make it a date"}
           </p>
           <p className="mb-4 flex gap-3 text-sm text-slate-300">
-            <CalendarDays size={19} className="shrink-0 text-lime-200" />
+            <CalendarDays size={19} className="shrink-0 text-sky-200" />
             {new Date(event.date).toLocaleString("en-GB", {
               day: "numeric",
               month: "long",
@@ -177,11 +177,11 @@ export default function EventDetails() {
             (Dhaka)
           </p>
           <p className="mb-4 flex gap-3 text-sm text-slate-300">
-            <MapPin size={19} className="shrink-0 text-lime-200" />
+            <MapPin size={19} className="shrink-0 text-sky-200" />
             {event.location}
           </p>
           <p className="mb-7 flex gap-3 text-sm text-slate-300">
-            <Users size={19} className="shrink-0 text-lime-200" />
+            <Users size={19} className="shrink-0 text-sky-200" />
             {event.capacity == null
               ? "Open registration"
               : `${event.registrationCount || 0} / ${event.capacity} places filled`}
@@ -189,15 +189,13 @@ export default function EventDetails() {
           {user?.role === "Student" ? (
             <>
               {registered && (
-                <p className="mb-4 text-sm text-lime-200">
-                  ✓ You’re registered
-                </p>
+                <p className="mb-4 text-sm text-sky-200">✓ You’re registered</p>
               )}
               {!ended && (
                 <button
                   onClick={mutate}
                   disabled={busy || (!registered && full)}
-                  className="w-full rounded-full bg-lime-200 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50"
+                  className="w-full rounded-full bg-[#5d429a] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
                 >
                   {busy
                     ? "Please wait…"
@@ -212,7 +210,7 @@ export default function EventDetails() {
                 <button
                   onClick={certificate}
                   disabled={busy}
-                  className="w-full rounded-full bg-lime-200 px-5 py-3 text-sm font-semibold text-slate-950"
+                  className="w-full rounded-full bg-[#5d429a] px-5 py-3 text-sm font-semibold text-white"
                 >
                   {busy ? "Preparing…" : "Download certificate"}
                 </button>
@@ -221,7 +219,7 @@ export default function EventDetails() {
           ) : !user && !ended ? (
             <Link
               to="/login"
-              className="block rounded-full bg-lime-200 px-5 py-3 text-center text-sm font-semibold text-slate-950"
+              className="block rounded-full bg-[#5d429a] px-5 py-3 text-center text-sm font-semibold text-white"
             >
               Sign in to register
             </Link>
@@ -229,7 +227,7 @@ export default function EventDetails() {
           {owner && (
             <Link
               to={`/organizers/manage-event/${event._id}`}
-              className="mt-4 block text-sm text-lime-200"
+              className="mt-4 block text-sm text-sky-200"
             >
               Manage event ↗
             </Link>
@@ -240,7 +238,7 @@ export default function EventDetails() {
             </p>
           )}
           {message && (
-            <p role="status" className="mt-4 text-sm text-lime-200">
+            <p role="status" className="mt-4 text-sm text-sky-200">
               {message}
             </p>
           )}
