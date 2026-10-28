@@ -44,46 +44,25 @@ const generateCertificate = async (req, res) => {
 
     doc.pipe(res);
 
-    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke();
-    doc
-      .fontSize(18)
-      .font("Helvetica-Bold")
-      .text(event.createdBy?.clubName || "Eventify", { align: "center" });
-    doc.moveDown(2);
-    doc
-      .fontSize(36)
-      .font("Helvetica-Bold")
-      .text("Certificate of Participation", { align: "center" });
-    doc.moveDown(1.5);
-    doc
-      .fontSize(20)
-      .font("Helvetica")
-      .text("This is to certify that", { align: "center" });
-    doc.moveDown(1);
-    doc
-      .fontSize(28)
-      .font("Helvetica-Bold")
-      .text(req.user.fullName || req.user.username, { align: "center" });
-    doc.moveDown(1);
-    doc
-      .fontSize(20)
-      .font("Helvetica")
-      .text("successfully participated in the event", { align: "center" });
-    doc.moveDown(1);
-    doc
-      .fontSize(28)
-      .font("Helvetica-Bold")
-      .text(`"${event.title}"`, { align: "center" });
-    doc.moveDown(0.8);
-    doc
-      .fontSize(16)
-      .font("Helvetica")
-      .text(`held on ${new Date(event.date).toLocaleDateString()}`, {
-        align: "center",
-      });
-    doc.moveDown(3);
-    doc.fontSize(14).text("_________________________", { align: "center" });
-    doc.fontSize(12).text("Event Coordinator", { align: "center" });
+    const width = doc.page.width - 100;
+    const centered = (text, y, size, bold = false) => {
+      const label = String(text || "").replace(/[\r\n]+/g, " ");
+      doc.font(bold ? "Helvetica-Bold" : "Helvetica").fontSize(size);
+      while (doc.widthOfString(label) > width && size > 11) doc.fontSize(--size);
+      doc.text(label, 50, y, { width, height: 45, align: "center", ellipsis: true });
+    };
+    doc.lineWidth(2).strokeColor("#263b35").rect(24, 24, doc.page.width - 48, doc.page.height - 48).stroke();
+    doc.lineWidth(0.5).strokeColor("#b7c8a3").rect(32, 32, doc.page.width - 64, doc.page.height - 64).stroke();
+    doc.fillColor("#263b35");
+    centered(event.createdBy?.clubName || "Eventify", 64, 18, true);
+    centered("Certificate of Participation", 119, 34, true);
+    centered("This is to certify that", 194, 17);
+    centered(req.user.fullName || req.user.username, 232, 29, true);
+    centered("successfully participated in the event", 287, 17);
+    centered(event.title, 328, 26, true);
+    centered(`Held on ${new Date(event.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Dhaka" })}`, 384, 15);
+    doc.moveTo(doc.page.width / 2 - 110, 482).lineTo(doc.page.width / 2 + 110, 482).stroke();
+    centered("Event Coordinator", 494, 12);
 
     doc.end();
   } catch (error) {

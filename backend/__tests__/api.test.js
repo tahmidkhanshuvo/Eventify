@@ -134,6 +134,8 @@ describe("Full API Workflow", () => {
         .set("Authorization", `Bearer ${studentToken}`);
       expect(res.statusCode).toEqual(200);
       expect(res.headers["content-type"]).toBe("application/pdf");
+      const pdf = res.body.toString("latin1");
+      expect(pdf.match(/\/Type\s*\/Page\b/g)).toHaveLength(1);
     });
   });
 
