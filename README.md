@@ -16,6 +16,8 @@ A university event platform for discovery, organizer approval, registrations and
 
 Originally built by **Team If_It_Works_It_Works** for **AUST CSE Carnival 6.0 Hackathon**. The application now uses real account/event data throughout its calendar, dashboards and approved-club directory. An empty calendar means no upcoming events have been published; sample cards are not presented as real events. Free hosting may take a moment to wake after inactivity.
 
+The interface preserves the original dark theme, purple/blue/teal gradients, white logo and animated background. Responsive layouts, accessibility and functional repairs build on that visual identity.
+
 ## Explore the application
 
 | Role        | Working flows                                                                                                                                       |
